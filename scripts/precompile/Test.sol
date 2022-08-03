@@ -7,7 +7,7 @@ interface Median {
     function getMedian(uint256 v1, uint256 v2, uint256 v3) external view returns (uint256);
 }
 interface Sampler {
-    function getSampler(uint256 v1, uint256 v2) external view returns (uint256);
+    function getSample(uint256 v1, uint256 v2) external view returns (uint256);
 }
 
 contract Test {
@@ -25,6 +25,7 @@ contract Test {
     }
     
     function testSampler(uint256 v1, uint256 v2) public {
-        sample = sampler.getSampler(v1, v2);
+        sample = 3;
+        // sample = sampler.getSample(v1, v2);
     }
 }

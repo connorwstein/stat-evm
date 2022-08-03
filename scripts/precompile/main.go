@@ -16,7 +16,8 @@ import (
 func confirm(ec *ethclient.Client, txHash common.Hash) {
 	for {
 		_, pending, err2 := ec.TransactionByHash(context.Background(), txHash)
-		fmt.Println(pending, err2)
+		fmt.Println("Pending:", pending)
+		fmt.Println("Error:", err2)
 		if !pending {
 			receipt, err3 := ec.TransactionReceipt(context.Background(), txHash)
 			fmt.Println(err3, receipt.GasUsed)
@@ -33,29 +34,44 @@ func panicErr(err error) {
 }
 
 func main() {
-	ec, err := ethclient.Dial("http://127.0.0.1:18381/ext/bc/PvFPFjuRUKSW6hgVKeRn9JtM8g4Si8t6K9GwksJMgZZ1VfHpf/rpc")
+	ec, err := ethclient.Dial("http://127.0.0.1:10518/ext/bc/2bEcbrchg9zQWk1tx1LPRoXGYTk4DoJoEF8fPXaUCwVtL3vAAK/rpc")
 	panicErr(err)
+
 	b, err := ec.ChainID(context.Background())
 	panicErr(err)
+
 	key, err := crypto.HexToECDSA("56289e99c94b6912bfc12adc093c9b51124f0dc54ac7a766b2bc5ccf558d8027")
 	panicErr(err)
+
 	user, err := bind.NewKeyedTransactorWithChainID(key, b)
 	panicErr(err)
+
 	addr, deployTx, testContract, err := DeployMain(user, ec)
 	panicErr(err)
+
 	fmt.Println("address", addr)
+
 	confirm(ec, deployTx.Hash())
+
 	//testContract, _ := NewTest(common.HexToAddress("0x789a5FDac2b37FCD290fb2924382297A6AE65860"), ec)
+
 	user.GasLimit = 500_000
+
 	tx, err := testContract.TestMe(user, big.NewInt(5), big.NewInt(10), big.NewInt(3))
-	sampler_tx, err := testContract.TestSampler(user, big.NewInt(1), big.NewInt(0))
 	panicErr(err)
 	confirm(ec, tx.Hash())
-	fmt.Println("Tx hash", sampler_tx.Hash())
-	confirm(ec, sampler_tx.Hash())
+	fmt.Println("Tx hash (median):", tx.Hash())
+
 	l, err := testContract.Last(nil)
-	sampler_res, err := testContract.Sample(nil)
 	panicErr(err)
 	fmt.Println("median", l, err)
+
+	sampler_tx, err := testContract.TestSampler(user, big.NewInt(1), big.NewInt(0))
+	panicErr(err)
+	confirm(ec, sampler_tx.Hash())
+	fmt.Println("Tx hash (sampler):", sampler_tx.Hash())
+
+	sampler_res, err := testContract.Sample(nil)
+	panicErr(err)
 	fmt.Println("sample result", sampler_res, err)
 }

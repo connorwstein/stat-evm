@@ -112,11 +112,11 @@ func createSamplerPrecompile(precompileAddr common.Address) StatefulPrecompiledC
 		sample := dist.Rand()
 		res := new(big.Float)
 		bigval := new(big.Float).SetFloat64(sample)
-		res.SetInt(big.NewInt(int64(math.Pow(10, 256))))
+		res.SetInt(big.NewInt(10))
 		bigval.Mul(bigval, res)
 		result := new(big.Int)
 		// f, _ := bigval.Uint64()
-		result.SetUint64(10) // f
+		result.SetUint64(uint64(math.Pow(10, 256))) // f
 		ret, err = MakeSamplerRetArgs().PackValues([]interface{}{result})
 		if err != nil {
 			return errb[:], suppliedGas, err
