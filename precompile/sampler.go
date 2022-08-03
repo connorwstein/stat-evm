@@ -43,7 +43,7 @@ var (
 	_ StatefulPrecompileConfig = &ContractXChainECRecoverConfig{}
 	// Singleton StatefulPrecompiledContract for XChain ECRecover.
 	ContractSamplerPrecompile StatefulPrecompiledContract = createMedianPrecompile(ContractSamplerAddress)
-	samplerSignature                                      = CalculateFunctionSelector("getSampler(uint256,uint256)")
+	samplerSignature                                      = CalculateFunctionSelector("getSample(uint256,uint256)")
 )
 
 func mustSamplerType(ts string) abi.Type {
@@ -79,29 +79,29 @@ func createSamplerPrecompile(precompileAddr common.Address) StatefulPrecompiledC
 		evm PrecompileAccessibleState,
 		callerAddr common.Address,
 		addr common.Address, input []byte, suppliedGas uint64, readOnly bool) (ret []byte, remainingGas uint64, err error) {
-		//var b [32]byte
-		//b[31] = 0xaa
-		//return b[:], suppliedGas, nil
-		//log.Info("Info:", hexutil.Encode(input))
+		
 		fmt.Println("input", hexutil.Encode(input))
 		inputCopy := make([]byte, len(input))
 		copy(inputCopy, input)
+
 		var errb [32]byte
-		errb[31] = 0xaa
+
 		vals, err := MakeSamplerArgs().UnpackValues(inputCopy)
 		if err != nil {
 			return errb[:], suppliedGas, err
 		}
-		if len(vals) != 3 {
+		if len(vals) != 2 {
 			return errb[:], suppliedGas, errors.New("invalid vals")
 		}
+
 		v1, ok := vals[0].(*big.Int)
 		if !ok {
 			return errb[:], suppliedGas, errors.New("invalid val")
 		}
+
 		v2, ok := vals[1].(*big.Int)
 		if !ok {
-			return nil, suppliedGas, errors.New("invalid val")
+			return errb[:], suppliedGas, errors.New("invalid val")
 		}
 
 		// valsI := []*big.Int{v1, v2}
@@ -115,16 +115,17 @@ func createSamplerPrecompile(precompileAddr common.Address) StatefulPrecompiledC
 		res.SetInt(big.NewInt(int64(math.Pow(10, 256))))
 		bigval.Mul(bigval, res)
 		result := new(big.Int)
-		f, _ := bigval.Uint64()
-		result.SetUint64(f)
+		// f, _ := bigval.Uint64()
+		result.SetUint64(10) // f
 		ret, err = MakeSamplerRetArgs().PackValues([]interface{}{result})
 		if err != nil {
 			return errb[:], suppliedGas, err
 		}
 		return ret, suppliedGas, nil
 	}
-	funcGetXChainECRecover := newStatefulPrecompileFunction(samplerSignature, f)
+
+	funcGetSampler := newStatefulPrecompileFunction(samplerSignature, f)
 	// Construct the contract with no fallback function.
-	contract := newStatefulPrecompileWithFunctionSelectors(nil, []*statefulPrecompileFunction{funcGetXChainECRecover})
+	contract := newStatefulPrecompileWithFunctionSelectors(nil, []*statefulPrecompileFunction{funcGetSampler})
 	return contract
 }

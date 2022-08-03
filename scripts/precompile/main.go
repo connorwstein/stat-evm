@@ -33,7 +33,7 @@ func panicErr(err error) {
 }
 
 func main() {
-	ec, err := ethclient.Dial("http://127.0.0.1:10525/ext/bc/HgkFe6YaPjgYSG4JupDqpNaVQWTD8oatZ6SanEnUyyagkj2Vj/rpc")
+	ec, err := ethclient.Dial("http://127.0.0.1:18381/ext/bc/PvFPFjuRUKSW6hgVKeRn9JtM8g4Si8t6K9GwksJMgZZ1VfHpf/rpc")
 	panicErr(err)
 	b, err := ec.ChainID(context.Background())
 	panicErr(err)
