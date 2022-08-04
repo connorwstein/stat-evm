@@ -34,7 +34,7 @@ func panicErr(err error) {
 }
 
 func main() {
-	ec, err := ethclient.Dial("http://127.0.0.1:10518/ext/bc/2bEcbrchg9zQWk1tx1LPRoXGYTk4DoJoEF8fPXaUCwVtL3vAAK/rpc")
+	ec, err := ethclient.Dial("http://127.0.0.1:38663/ext/bc/sGYaHjBVZBNEHypyiXUZdsYRW5w43spUDHmFYgHVVymaLuqpw/rpc")
 	panicErr(err)
 
 	b, err := ec.ChainID(context.Background())
@@ -53,11 +53,9 @@ func main() {
 
 	confirm(ec, deployTx.Hash())
 
-	//testContract, _ := NewTest(common.HexToAddress("0x789a5FDac2b37FCD290fb2924382297A6AE65860"), ec)
-
 	user.GasLimit = 500_000
 
-	tx, err := testContract.TestMe(user, big.NewInt(5), big.NewInt(10), big.NewInt(3))
+	tx, err := testContract.TestMedian(user, big.NewInt(5), big.NewInt(10), big.NewInt(3))
 	panicErr(err)
 	confirm(ec, tx.Hash())
 	fmt.Println("Tx hash (median):", tx.Hash())
@@ -66,7 +64,7 @@ func main() {
 	panicErr(err)
 	fmt.Println("median", l, err)
 
-	sampler_tx, err := testContract.TestSampler(user, big.NewInt(1), big.NewInt(0))
+	sampler_tx, err := testContract.TestSampler(user, big.NewInt(0000000000000000000), big.NewInt(1000000000000000000))
 	panicErr(err)
 	confirm(ec, sampler_tx.Hash())
 	fmt.Println("Tx hash (sampler):", sampler_tx.Hash())

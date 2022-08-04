@@ -1,5 +1,3 @@
-// (c) 2022-2023, Ava Labs, Inc. All rights reserved.
-// See the file LICENSE for licensing terms.
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0;
 
@@ -11,21 +9,19 @@ interface Sampler {
 }
 
 contract Test {
-    uint256 public last;
-    uint256 public sample;
+    uint256 public last = 0;
+    uint256 public sample = 3;
 
     event Debug(string message, bytes32 res);
 
     Median prec = Median(0x0300000000000000000000000000000000000001);
     Sampler sampler = Sampler(0x0300000000000000000000000000000000000004);
 
-    function testMe(uint256 v1, uint256 v2, uint256 v3) public {
+    function testMedian(uint256 v1, uint256 v2, uint256 v3) public {
         last = prec.getMedian(v1, v2, v3);
-//        emit Debug("testMe()", last);
     }
     
     function testSampler(uint256 v1, uint256 v2) public {
-        sample = 3;
-        // sample = sampler.getSample(v1, v2);
+        sample = sampler.getSample(v1, v2);
     }
 }
