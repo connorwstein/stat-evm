@@ -3,7 +3,6 @@ package precompile
 import (
 	"errors"
 	"fmt"
-	"math"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
@@ -40,10 +39,8 @@ func (c ContractSamplerConfig) Contract() StatefulPrecompiledContract {
 }
 
 var (
-	_ StatefulPrecompileConfig = &ContractXChainECRecoverConfig{}
-	// Singleton StatefulPrecompiledContract for XChain ECRecover.
-	ContractSamplerPrecompile StatefulPrecompiledContract = createMedianPrecompile(ContractSamplerAddress)
-	samplerSignature                                      = CalculateFunctionSelector("getSample(uint256,uint256)")
+	ContractSamplerPrecompile StatefulPrecompiledContract = createSamplerPrecompile(ContractSamplerAddress)
+	samplerSignature = CalculateFunctionSelector("getSample(uint256,uint256)")
 )
 
 func mustSamplerType(ts string) abi.Type {
@@ -65,7 +62,6 @@ func MakeSamplerArgs() abi.Arguments {
 }
 
 func MakeSamplerRetArgs() abi.Arguments {
-	//cocos,taste of thai express,sangcan indian
 	return abi.Arguments{
 		{
 			Name: "ret",
@@ -104,19 +100,16 @@ func createSamplerPrecompile(precompileAddr common.Address) StatefulPrecompiledC
 			return errb[:], suppliedGas, errors.New("invalid val")
 		}
 
-		// valsI := []*big.Int{v1, v2}
 		dist := distuv.Normal{
 			Mu:    float64(v1.Int64()), // Mean of the normal distribution
 			Sigma: float64(v2.Int64()), // Standard deviation of the normal distribution
 		}
 		sample := dist.Rand()
-		res := new(big.Float)
+
 		bigval := new(big.Float).SetFloat64(sample)
-		res.SetInt(big.NewInt(10))
-		bigval.Mul(bigval, res)
-		result := new(big.Int)
-		// f, _ := bigval.Uint64()
-		result.SetUint64(uint64(math.Pow(10, 256))) // f
+
+		f, _ := bigval.Uint64()
+		result := new(big.Int).SetUint64(f)
 		ret, err = MakeSamplerRetArgs().PackValues([]interface{}{result})
 		if err != nil {
 			return errb[:], suppliedGas, err
@@ -125,7 +118,7 @@ func createSamplerPrecompile(precompileAddr common.Address) StatefulPrecompiledC
 	}
 
 	funcGetSampler := newStatefulPrecompileFunction(samplerSignature, f)
-	// Construct the contract with no fallback function.
-	contract := newStatefulPrecompileWithFunctionSelectors(nil, []*statefulPrecompileFunction{funcGetSampler})
-	return contract
+
+	// Return new contract with no fallback function.
+	return newStatefulPrecompileWithFunctionSelectors(nil, []*statefulPrecompileFunction{funcGetSampler})
 }

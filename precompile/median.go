@@ -39,10 +39,8 @@ func (c ContractMedianConfig) Contract() StatefulPrecompiledContract {
 }
 
 var (
-	_ StatefulPrecompileConfig = &ContractXChainECRecoverConfig{}
-	// Singleton StatefulPrecompiledContract for XChain ECRecover.
 	ContractMedianPrecompile StatefulPrecompiledContract = createMedianPrecompile(ContractMedianAddress)
-	medianSignature                                      = CalculateFunctionSelector("getMedian(uint256,uint256,uint256)")
+	medianSignature = CalculateFunctionSelector("getMedian(uint256,uint256,uint256)")
 )
 
 func mustType(ts string) abi.Type {
