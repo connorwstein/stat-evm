@@ -2,13 +2,11 @@ package precompile
 
 import (
 	"errors"
-	"fmt"
 	"math/big"
 	"sort"
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/hexutil"
 )
 
 type ContractMedianConfig struct {

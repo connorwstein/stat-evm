@@ -45,6 +45,7 @@ var (
 	ContractXchainECRecoverAddress   = common.HexToAddress("0x0300000000000000000000000000000000000000")
 	ContractMedianAddress            = common.HexToAddress("0x0300000000000000000000000000000000000001")
 	ContractSamplerAddress           = common.HexToAddress("0x0300000000000000000000000000000000000004")
+	ContractSimpleAddress            = common.HexToAddress("0x0300000000000000000000000000000000000005") 
 
 	UsedAddresses = []common.Address{
 		ContractDeployerAllowListAddress,

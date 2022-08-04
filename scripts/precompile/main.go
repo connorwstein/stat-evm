@@ -37,7 +37,7 @@ func panicErr(err error) {
 }
 
 func start_events(ec *ethclient.Client, addr common.Address) {
-	ec, err := ethclient.Dial("ws://127.0.0.1:26167/ext/bc/2PrUigST926itA6vfXTAzs36jxg1PEDXkC6Lti8XggpbHs9qFY/ws")
+	ec, err := ethclient.Dial("ws://127.0.0.1:26926/ext/bc/2BGVezfcBHZfAnr8nq1w7q69aVHVjdCQ577F6LdztByAXSXBDM/ws")
 	query := ethereum.FilterQuery{
 		Addresses: []common.Address{addr},
 	}
@@ -54,12 +54,13 @@ func start_events(ec *ethclient.Client, addr common.Address) {
 			log.Fatal(err)
 		case vLog := <-logs:
 			fmt.Println(vLog) // pointer to event log
+			fmt.Println()
 		}
 	}
 }
 
 func main() {
-	ec, err := ethclient.Dial("http://127.0.0.1:23281/ext/bc/WjXj74MaoFHMhmHx8xGQGRYcvXRQdQnP4sNRnK8vTMmoGXyRE/rpc")
+	ec, err := ethclient.Dial("http://127.0.0.1:26926/ext/bc/2BGVezfcBHZfAnr8nq1w7q69aVHVjdCQ577F6LdztByAXSXBDM/rpc")
 	panicErr(err)
 
 	b, err := ec.ChainID(context.Background())
@@ -80,6 +81,8 @@ func main() {
 
 	user.GasLimit = 500_000
 
+	go start_events(ec, addr)
+
 	tx, err := testContract.TestMedian(user, big.NewInt(5), big.NewInt(10), big.NewInt(3))
 	panicErr(err)
 	confirm(ec, tx.Hash())
@@ -97,6 +100,13 @@ func main() {
 	sampler_res, err := testContract.Sample(nil)
 	panicErr(err)
 	fmt.Println("sample result", sampler_res, err)
-	start_events(ec, addr)
 
+	simple_tx, err := testContract.TestSimple(user, big.NewInt(0))
+	panicErr(err)
+	confirm(ec, simple_tx.Hash())
+	fmt.Println("Tx hash (simple):", simple_tx.Hash())
+
+	simple_res, err := testContract.LastSimple(nil)
+	panicErr(err)
+	fmt.Println("simple result", simple_res, err)
 }
