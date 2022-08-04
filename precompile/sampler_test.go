@@ -15,7 +15,7 @@ func TestSampler(t *testing.T) {
 	suppliedGas := 500_000
 
 	// a, err := MakeSamplerArgs().PackValues([]interface{}{big.NewInt(0), big.NewInt(1)})
-	a, err := MakeSamplerArgs().PackValues([]interface{}{big.NewInt(0000000000000000000), big.NewInt(1000000000000000000)})
+	a, err := MakeSamplerArgs().PackValues([]interface{}{big.NewInt(0), big.NewInt(1000000000000000000)})
 	require.NoError(t, err)
 	fmt.Println("Encoded packed values", hexutil.Encode(a[:]))
 	vals, err := MakeSamplerArgs().UnpackValues(a)

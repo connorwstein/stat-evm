@@ -81,7 +81,7 @@ func createSamplerPrecompile(precompileAddr common.Address) StatefulPrecompiledC
 		copy(inputCopy, input)
 
 		var errb [32]byte
-		errb[31] = 0xaa
+		// errb[31] = 0xaa
 
 		vals, err := MakeSamplerArgs().UnpackValues(inputCopy)
 		if err != nil {
@@ -108,6 +108,7 @@ func createSamplerPrecompile(precompileAddr common.Address) StatefulPrecompiledC
 		sample := dist.Rand()
 
 		bigval := new(big.Float).SetFloat64(sample)
+		// bigval = new(big.Float).SetFloat64(1924570923.124124) // Hardcoding a value works
 
 		f, _ := bigval.Uint64()
 		result := new(big.Int).SetUint64(f)
@@ -115,6 +116,7 @@ func createSamplerPrecompile(precompileAddr common.Address) StatefulPrecompiledC
 		if err != nil {
 			return errb[:], suppliedGas, err
 		}
+
 		return ret, suppliedGas, nil
 	}
 
