@@ -66,7 +66,6 @@ func MakeArgs() abi.Arguments {
 }
 
 func MakeRetArgs() abi.Arguments {
-	//cocos,taste of thai express,sangcan indian
 	return abi.Arguments{
 		{
 			Name: "ret",
@@ -79,16 +78,17 @@ func createMedianPrecompile(precompileAddr common.Address) StatefulPrecompiledCo
 	f := func(
 		evm PrecompileAccessibleState,
 		callerAddr common.Address,
-		addr common.Address, input []byte, suppliedGas uint64, readOnly bool) (ret []byte, remainingGas uint64, err error) {
-		//var b [32]byte
-		//b[31] = 0xaa
-		//return b[:], suppliedGas, nil
-		//log.Info("Info:", hexutil.Encode(input))
-		fmt.Println("input", hexutil.Encode(input))
+		addr common.Address,
+		input []byte,
+		suppliedGas uint64,
+		readOnly bool,
+	) (ret []byte, remainingGas uint64, err error) {
 		inputCopy := make([]byte, len(input))
 		copy(inputCopy, input)
+
 		var errb [32]byte
 		errb[31] = 0xaa
+
 		vals, err := MakeArgs().UnpackValues(inputCopy)
 		if err != nil {
 			return errb[:], suppliedGas, err
@@ -96,31 +96,38 @@ func createMedianPrecompile(precompileAddr common.Address) StatefulPrecompiledCo
 		if len(vals) != 3 {
 			return errb[:], suppliedGas, errors.New("invalid vals")
 		}
+
 		v1, ok := vals[0].(*big.Int)
 		if !ok {
 			return errb[:], suppliedGas, errors.New("invalid val")
 		}
+
 		v2, ok := vals[1].(*big.Int)
 		if !ok {
 			return nil, suppliedGas, errors.New("invalid val")
 		}
+
 		v3, ok := vals[2].(*big.Int)
 		if !ok {
 			return nil, suppliedGas, errors.New("invalid val")
 		}
+
 		valsI := []*big.Int{v1, v2, v3}
 		sort.Slice(valsI, func(i, j int) bool {
 			return valsI[i].Cmp(valsI[j]) == -1
 		})
 		med := valsI[len(valsI)/2]
+
 		ret, err = MakeRetArgs().PackValues([]interface{}{med})
 		if err != nil {
 			return errb[:], suppliedGas, err
 		}
+
 		return ret, suppliedGas, nil
 	}
-	funcGetXChainECRecover := newStatefulPrecompileFunction(medianSignature, f)
-	// Construct the contract with no fallback function.
-	contract := newStatefulPrecompileWithFunctionSelectors(nil, []*statefulPrecompileFunction{funcGetXChainECRecover})
-	return contract
+
+	funcGetMedian := newStatefulPrecompileFunction(medianSignature, f)
+	
+	// Return new contract with no fallback function.
+	return newStatefulPrecompileWithFunctionSelectors(nil, []*statefulPrecompileFunction{funcGetMedian})
 }

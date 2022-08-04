@@ -74,13 +74,16 @@ func createSamplerPrecompile(precompileAddr common.Address) StatefulPrecompiledC
 	f := func(
 		evm PrecompileAccessibleState,
 		callerAddr common.Address,
-		addr common.Address, input []byte, suppliedGas uint64, readOnly bool) (ret []byte, remainingGas uint64, err error) {
-		
-		fmt.Println("input", hexutil.Encode(input))
+		addr common.Address,
+		input []byte,
+		suppliedGas uint64,
+		readOnly bool,
+	) (ret []byte, remainingGas uint64, err error) {
 		inputCopy := make([]byte, len(input))
 		copy(inputCopy, input)
 
 		var errb [32]byte
+		errb[31] = 0xaa
 
 		vals, err := MakeSamplerArgs().UnpackValues(inputCopy)
 		if err != nil {
