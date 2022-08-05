@@ -80,28 +80,20 @@ func main() {
 	confirm(ec, deployTx.Hash())
 
 	user.GasLimit = 500_000
-
-	//go start_events(ec, addr)
-
-	tx, err := testContract.TestMedian(user, big.NewInt(5), big.NewInt(10), big.NewInt(3))
+	tx, err := testContract.TestMedian(user, []*big.Int{big.NewInt(5), big.NewInt(10), big.NewInt(3), big.NewInt(7), big.NewInt(12)})
 	panicErr(err)
 	confirm(ec, tx.Hash())
 	fmt.Println("Tx hash (median):", tx.Hash())
-
-	l, err := testContract.Last(nil)
+	l, err := testContract.Med(nil)
 	panicErr(err)
 	fmt.Println("median", l, err)
-
-	sampler_res, err := testContract.Sample(nil)
-	panicErr(err)
-	fmt.Println("sample result", sampler_res, err)
 
 	sampler_tx, err := testContract.TestSampler(user, big.NewInt(1), big.NewInt(1000000000000000000))
 	panicErr(err)
 	confirm(ec, sampler_tx.Hash())
 	fmt.Println("Tx hash (sampler):", sampler_tx.Hash())
 
-	sampler_res, err = testContract.Sample(nil)
+	sampler_res, err := testContract.Sample(nil)
 	panicErr(err)
 	fmt.Println("sample result", sampler_res, err)
 

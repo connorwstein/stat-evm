@@ -7,6 +7,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
 )
 
 type ContractMedianConfig struct {
@@ -38,7 +39,7 @@ func (c ContractMedianConfig) Contract() StatefulPrecompiledContract {
 
 var (
 	ContractMedianPrecompile StatefulPrecompiledContract = createMedianPrecompile(ContractMedianAddress)
-	medianSignature                                      = CalculateFunctionSelector("getMedian(uint256,uint256,uint256)")
+	medianSignature                                      = crypto.Keccak256([]byte("getMedian(uint256[])"))[:4]
 )
 
 func mustType(ts string) abi.Type {
@@ -49,16 +50,8 @@ func mustType(ts string) abi.Type {
 func MakeArgs() abi.Arguments {
 	return abi.Arguments{
 		{
-			Name: "v1",
-			Type: mustType("uint256"),
-		},
-		{
-			Name: "v2",
-			Type: mustType("uint256"),
-		},
-		{
-			Name: "v3",
-			Type: mustType("uint256"),
+			Name: "vals",
+			Type: mustType("uint256[]"),
 		},
 	}
 }
@@ -72,60 +65,32 @@ func MakeRetArgs() abi.Arguments {
 	}
 }
 
-func createMedianPrecompile(precompileAddr common.Address) StatefulPrecompiledContract {
-	f := func(
-		evm PrecompileAccessibleState,
-		callerAddr common.Address,
-		addr common.Address,
-		input []byte,
-		suppliedGas uint64,
-		readOnly bool,
-	) (ret []byte, remainingGas uint64, err error) {
-		inputCopy := make([]byte, len(input))
-		copy(inputCopy, input)
-
-		var errb [32]byte
-		errb[31] = 0xaa
-
-		vals, err := MakeArgs().UnpackValues(inputCopy)
-		if err != nil {
-			return errb[:], suppliedGas, err
-		}
-		if len(vals) != 3 {
-			return errb[:], suppliedGas, errors.New("invalid vals")
-		}
-
-		v1, ok := vals[0].(*big.Int)
-		if !ok {
-			return errb[:], suppliedGas, errors.New("invalid val")
-		}
-
-		v2, ok := vals[1].(*big.Int)
-		if !ok {
-			return nil, suppliedGas, errors.New("invalid val")
-		}
-
-		v3, ok := vals[2].(*big.Int)
-		if !ok {
-			return nil, suppliedGas, errors.New("invalid val")
-		}
-
-		valsI := []*big.Int{v1, v2, v3}
-		sort.Slice(valsI, func(i, j int) bool {
-			return valsI[i].Cmp(valsI[j]) == -1
-		})
-		med := valsI[len(valsI)/2]
-
-		ret, err = MakeRetArgs().PackValues([]interface{}{med})
-		if err != nil {
-			return errb[:], suppliedGas, err
-		}
-
-		return ret, suppliedGas, nil
+func getMedian(evm PrecompileAccessibleState,
+	callerAddr common.Address,
+	addr common.Address, input []byte, suppliedGas uint64, readOnly bool) (ret []byte, remainingGas uint64, err error) {
+	inputCopy := make([]byte, len(input))
+	copy(inputCopy, input)
+	valsI, err := MakeArgs().UnpackValues(inputCopy)
+	if err != nil {
+		return nil, suppliedGas, err
 	}
+	vals, ok := valsI[0].([]*big.Int)
+	if !ok {
+		return nil, suppliedGas, errors.New("invalid type")
+	}
+	sort.Slice(vals, func(i, j int) bool {
+		return vals[i].Cmp(vals[j]) == -1
+	})
+	med := vals[len(vals)/2]
+	ret, err = MakeRetArgs().PackValues([]interface{}{med})
+	if err != nil {
+		return nil, suppliedGas, err
+	}
+	return ret, suppliedGas, nil
+}
 
-	funcGetMedian := newStatefulPrecompileFunction(medianSignature, f)
-
-	// Return new contract with no fallback function.
-	return newStatefulPrecompileWithFunctionSelectors(nil, []*statefulPrecompileFunction{funcGetMedian})
+func createMedianPrecompile(precompileAddr common.Address) StatefulPrecompiledContract {
+	// Construct the contract with no fallback function.
+	contract := newStatefulPrecompileWithFunctionSelectors(nil, []*statefulPrecompileFunction{newStatefulPrecompileFunction(medianSignature, getMedian)})
+	return contract
 }
