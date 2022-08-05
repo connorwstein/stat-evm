@@ -38,7 +38,7 @@ func (c ContractMedianConfig) Contract() StatefulPrecompiledContract {
 
 var (
 	ContractMedianPrecompile StatefulPrecompiledContract = createMedianPrecompile(ContractMedianAddress)
-	medianSignature = CalculateFunctionSelector("getMedian(uint256,uint256,uint256)")
+	medianSignature                                      = CalculateFunctionSelector("getMedian(uint256,uint256,uint256)")
 )
 
 func mustType(ts string) abi.Type {
@@ -125,7 +125,7 @@ func createMedianPrecompile(precompileAddr common.Address) StatefulPrecompiledCo
 	}
 
 	funcGetMedian := newStatefulPrecompileFunction(medianSignature, f)
-	
+
 	// Return new contract with no fallback function.
 	return newStatefulPrecompileWithFunctionSelectors(nil, []*statefulPrecompileFunction{funcGetMedian})
 }

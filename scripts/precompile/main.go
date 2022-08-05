@@ -7,7 +7,7 @@ import (
 	"math/big"
 	"time"
 
-	ethereum "github.com/ethereum/go-ethereum"
+	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -60,7 +60,7 @@ func start_events(ec *ethclient.Client, addr common.Address) {
 }
 
 func main() {
-	ec, err := ethclient.Dial("http://127.0.0.1:12110/ext/bc/27CwA7qdA8LMMbQ4PuK3NtvFqsixUQj3yZzGbZG7tKFsWvXmLB/rpc")
+	ec, err := ethclient.Dial("http://127.0.0.1:11987/ext/bc/Vf9noCc7xT5viKRcvhhxK9JQ2LzVn1FLWU4uzGgwso99cybXu/rpc")
 	panicErr(err)
 
 	b, err := ec.ChainID(context.Background())
@@ -81,7 +81,7 @@ func main() {
 
 	user.GasLimit = 500_000
 
-	// go start_events(ec, addr)
+	//go start_events(ec, addr)
 
 	tx, err := testContract.TestMedian(user, big.NewInt(5), big.NewInt(10), big.NewInt(3))
 	panicErr(err)
@@ -92,12 +92,32 @@ func main() {
 	panicErr(err)
 	fmt.Println("median", l, err)
 
-	sampler_tx, err := testContract.TestSampler(user, big.NewInt(0), big.NewInt(1000000000000000000))
+	sampler_res, err := testContract.Sample(nil)
+	panicErr(err)
+	fmt.Println("sample result", sampler_res, err)
+
+	sampler_tx, err := testContract.TestSampler(user, big.NewInt(1), big.NewInt(1000000000000000000))
 	panicErr(err)
 	confirm(ec, sampler_tx.Hash())
 	fmt.Println("Tx hash (sampler):", sampler_tx.Hash())
 
-	sampler_res, err := testContract.Sample(nil)
+	sampler_res, err = testContract.Sample(nil)
 	panicErr(err)
 	fmt.Println("sample result", sampler_res, err)
+
+	var a [][]*big.Int
+	for i := 0; i < 1; i++ {
+		a = append(a, []*big.Int{big.NewInt(1), big.NewInt(2), big.NewInt(3)})
+	}
+	var b2 [][]*big.Int
+	for i := 0; i < 3; i++ {
+		b2 = append(b2, []*big.Int{big.NewInt(int64(i + 1))})
+	}
+	matrix_tx, err := testContract.TestMatrixMult(user, a, b2)
+	panicErr(err)
+	confirm(ec, matrix_tx.Hash())
+	fmt.Println("Tx hash (matrix):", matrix_tx.Hash())
+	vals, err := testContract.GetMatrixMulti(nil)
+	panicErr(err)
+	fmt.Println(vals)
 }

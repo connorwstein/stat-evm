@@ -6,6 +6,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
+	"golang.org/x/exp/rand"
 	"gonum.org/v1/gonum/stat/distuv"
 )
 
@@ -38,7 +39,7 @@ func (c ContractSamplerConfig) Contract() StatefulPrecompiledContract {
 
 var (
 	ContractSamplerPrecompile StatefulPrecompiledContract = createSamplerPrecompile(ContractSamplerAddress)
-	samplerSignature = CalculateFunctionSelector("getSample(uint256,uint256)")
+	samplerSignature                                      = CalculateFunctionSelector("getSample(uint256,uint256)")
 )
 
 func mustSamplerType(ts string) abi.Type {
@@ -63,65 +64,57 @@ func MakeSamplerRetArgs() abi.Arguments {
 	return abi.Arguments{
 		{
 			Name: "ret",
-			Type: mustType("uint256"),
+			Type: mustType("int256"),
 		},
 	}
 }
 
-func createSamplerPrecompile(precompileAddr common.Address) StatefulPrecompiledContract {
-	f := func(
-		evm PrecompileAccessibleState,
-		callerAddr common.Address,
-		addr common.Address,
-		input []byte,
-		suppliedGas uint64,
-		readOnly bool,
-	) (ret []byte, remainingGas uint64, err error) {
-		inputCopy := make([]byte, len(input))
-		copy(inputCopy, input)
-
-		var errb [32]byte
-		// errb[31] = 0xaa
-
-		vals, err := MakeSamplerArgs().UnpackValues(inputCopy)
-		if err != nil {
-			return errb[:], suppliedGas, err
-		}
-		if len(vals) != 2 {
-			return errb[:], suppliedGas, errors.New("invalid vals")
-		}
-
-		v1, ok := vals[0].(*big.Int)
-		if !ok {
-			return errb[:], suppliedGas, errors.New("invalid val")
-		}
-
-		v2, ok := vals[1].(*big.Int)
-		if !ok {
-			return errb[:], suppliedGas, errors.New("invalid val")
-		}
-
-		dist := distuv.Normal{
-			Mu:    float64(v1.Int64()), // Mean of the normal distribution
-			Sigma: float64(v2.Int64()), // Standard deviation of the normal distribution
-		}
-		sample := dist.Rand()
-
-		bigval := new(big.Float).SetFloat64(sample)
-		// bigval = new(big.Float).SetFloat64(1924570923.124124) // Hardcoding a value works
-
-		f, _ := bigval.Uint64()
-		result := new(big.Int).SetUint64(f)
-		ret, err = MakeSamplerRetArgs().PackValues([]interface{}{result})
-		if err != nil {
-			return errb[:], suppliedGas, err
-		}
-
-		return ret, suppliedGas, nil
+func sample(
+	evm PrecompileAccessibleState,
+	callerAddr common.Address,
+	addr common.Address,
+	input []byte,
+	suppliedGas uint64,
+	readOnly bool,
+) (ret []byte, remainingGas uint64, err error) {
+	inputCopy := make([]byte, len(input))
+	copy(inputCopy, input)
+	vals, err := MakeSamplerArgs().UnpackValues(inputCopy)
+	if err != nil {
+		return nil, suppliedGas, err
+	}
+	if len(vals) != 2 {
+		return nil, suppliedGas, errors.New("invalid vals")
 	}
 
-	funcGetSampler := newStatefulPrecompileFunction(samplerSignature, f)
+	v1, ok := vals[0].(*big.Int)
+	if !ok {
+		return nil, suppliedGas, errors.New("invalid val")
+	}
 
+	v2, ok := vals[1].(*big.Int)
+	if !ok {
+		return nil, suppliedGas, errors.New("invalid val")
+	}
+
+	dist := distuv.Normal{
+		Mu:    float64(v1.Int64()), // Mean of the normal distribution
+		Sigma: float64(v2.Int64()), // Standard deviation of the normal distribution
+		Src:   rand.NewSource(10),  // TODO: Need to read and write from state.
+	}
+	sample := dist.Rand()
+	bigval := new(big.Float).SetFloat64(sample)
+	f, _ := bigval.Int64()
+	result := new(big.Int).SetInt64(f)
+	ret, err = MakeSamplerRetArgs().PackValues([]interface{}{result})
+	if err != nil {
+		return nil, suppliedGas, err
+	}
+
+	return ret, suppliedGas, nil
+}
+
+func createSamplerPrecompile(precompileAddr common.Address) StatefulPrecompiledContract {
 	// Return new contract with no fallback function.
-	return newStatefulPrecompileWithFunctionSelectors(nil, []*statefulPrecompileFunction{funcGetSampler})
+	return newStatefulPrecompileWithFunctionSelectors(nil, []*statefulPrecompileFunction{newStatefulPrecompileFunction(samplerSignature, sample)})
 }
