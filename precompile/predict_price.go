@@ -5,13 +5,17 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math"
 	"math/big"
 	"os"
+	"strconv"
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/rocketlaunchr/dataframe-go"
 	"github.com/rocketlaunchr/dataframe-go/imports"
+	"gonum.org/v1/gonum/stat"
 )
 
 type ContractPredictPriceConfig struct {
@@ -69,11 +73,23 @@ func MakePredictPriceRetArgs() abi.Arguments {
 	}
 }
 
-type historicalData struct {
-	Date  string
-	Price string
+type SeriesFloat64 struct {
+	values []float64
 }
 
+func (s *SeriesFloat64) copy() *SeriesFloat64 {
+	if len(s.values) == 0 {
+		return &SeriesFloat64{
+			values: []float64{},
+		}
+	}
+	// Copy slice
+	x := s.values[0:len(s.values)]
+	newSlice := append(x[:0:0], x...)
+	return &SeriesFloat64{
+		values: newSlice,
+	}
+}
 func predictPrice(
 	evm PrecompileAccessibleState,
 	callerAddr common.Address,
@@ -106,8 +122,25 @@ func predictPrice(
 		log.Fatal(err)
 	}
 	df, err := imports.LoadFromCSV(ctx, csvfile)
-	// fmt.Println(df)
-	fmt.Print(df.Table())
+	iterator := df.ValuesIterator(dataframe.ValuesOptions{0, 1, true})
+	df.Lock()
+	var output []float64
+	for {
+		row, vals, _ := iterator()
+		if row == nil {
+			break
+		}
+		fmt.Println(vals[0], vals[4])
+		f := vals[4].(string)
+		floatNum, _ := strconv.ParseFloat(f, 32)
+		output = append(output, floatNum)
+	}
+	df.Unlock()
+	mean_res := stat.Mean(output, nil)
+	fmt.Println("Mu", mean_res)
+	variance := stat.Variance(output, nil)
+	stddev := math.Sqrt(variance)
+	fmt.Println("Sigma", stddev)
 	return ret, suppliedGas, nil
 }
 
