@@ -2,6 +2,7 @@ package precompile
 
 import (
 	"errors"
+	"math"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
@@ -181,13 +182,17 @@ func fit(
 	switch uint(fitType.Uint64()) {
 	case 0:
 		// Ordinary Least Squares (OLS)
-		var x_t_x_inv mat.Dense
-
-		x_t_x_inv.Mul(matX.T(), matX)
-		x_t_x_inv.Inverse(&x_t_x_inv)
-
-		result.Mul(matX.T(), matY)
-		result.Mul(&x_t_x_inv, &result)
+		regr := linearmodel.NewLinearRegression()
+		regr.Fit(matX, matY)
+		result = *regr.Coef
+		// Round up to nearest 5 decimal places (picked out of hat)
+		roundedDecimals := 5
+		cols, rows := result.Dims()
+		for row := 0; row < rows; row++ {
+			for col := 0; col < cols; col++ {
+				result.Set(row, col, math.Round(result.At(row, col)*math.Pow10(roundedDecimals))/math.Pow10(roundedDecimals))
+			}
+		}
 	case 1:
 		// Least Absolute Shrinkage and Selection Operator (LASSO)
 		regr := linearmodel.NewRidge()
@@ -198,13 +203,17 @@ func fit(
 		result = *regr.Coef
 	default:
 		// Ordinary Least Squares (OLS)
-		var x_t_x_inv mat.Dense
-
-		x_t_x_inv.Mul(matX.T(), matX)
-		x_t_x_inv.Inverse(&x_t_x_inv)
-
-		result.Mul(matX.T(), matY)
-		result.Mul(&x_t_x_inv, &result)
+		regr := linearmodel.NewLinearRegression()
+		regr.Fit(matX, matY)
+		result = *regr.Coef
+		// Round up to nearest 5 decimal places (picked out of hat)
+		roundedDecimals := 5
+		cols, rows := result.Dims()
+		for row := 0; row < rows; row++ {
+			for col := 0; col < cols; col++ {
+				result.Set(row, col, math.Round(result.At(row, col)*math.Pow10(roundedDecimals))/math.Pow10(roundedDecimals))
+			}
+		}
 	}
 
 	nr, _ := result.Dims()
