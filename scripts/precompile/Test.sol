@@ -15,15 +15,20 @@ interface Sampler {
 interface MatrixMult{
     function matrixMultiply(int256[][] memory a, int256[][] memory b) external view returns (int256[][] memory);
 }
+interface Fit{
+    function getFit(uint256[] memory vals) external view returns (uint256);
+}
 
 contract Test {
     uint256 public med;
     int256[] public sample;
     int256[][] product;
+    uint256 public fitRes;
     event Debug(string message, int256 res);
     Median prec = Median(0x0300000000000000000000000000000000000001);
     Sampler sampler = Sampler(0x0300000000000000000000000000000000000004);
     MatrixMult matrixMult = MatrixMult(0x0300000000000000000000000000000000000005);
+    Fit fit =Fit(0x0300000000000000000000000000000000000006);
 
     function testMedian(uint256[] memory vals) public {
         med = prec.getMedian(vals);
@@ -39,6 +44,10 @@ contract Test {
 
     function testMatrixMult(int256[][] memory a, int256[][] memory b) public {
         product = matrixMult.matrixMultiply(a, b);
+    }
+
+    function testFit(uint256[] memory vals) public {
+        fitRes = fit.getFit(vals);
     }
 
     function getMatrixMulti() public view returns (int256[][] memory) {

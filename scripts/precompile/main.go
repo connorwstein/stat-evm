@@ -60,7 +60,7 @@ func start_events(ec *ethclient.Client, addr common.Address) {
 }
 
 func main() {
-	ec, err := ethclient.Dial("http://127.0.0.1:13575/ext/bc/2QN6VdY4XxrxQvXcQBdaqTaMZkr2cdJnA5CE8W6MYyHt4Bw7fo/rpc")
+	ec, err := ethclient.Dial("http://127.0.0.1:32725/ext/bc/nA2gxunf9oofZtC9DqXcKzqbrVBssqaGZYSnQq6eSbxfg38RK/rpc")
 	panicErr(err)
 
 	b, err := ec.ChainID(context.Background())
@@ -112,4 +112,12 @@ func main() {
 	vals, err := testContract.GetMatrixMulti(nil)
 	panicErr(err)
 	fmt.Println(vals)
+
+	fit_tx, err := testContract.TestFit(user, []*big.Int{big.NewInt(10), big.NewInt(2), big.NewInt(2)})
+	panicErr(err)
+	confirm(ec, fit_tx.Hash())
+	fmt.Println("Tx hash (fit):", fit_tx.Hash())
+	fitRes, err := testContract.FitRes(nil)
+	panicErr(err)
+	fmt.Println(fitRes)
 }
