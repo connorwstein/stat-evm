@@ -61,7 +61,7 @@ func start_events(ec *ethclient.Client, addr common.Address) {
 }
 
 func main() {
-	ec, err := ethclient.Dial("http://127.0.0.1:16775/ext/bc/TssoHq3XmiJeE7ysFCG9eGropTT7STdCNsbAyNWke1ND4uL8b/rpc")
+	ec, err := ethclient.Dial("http://127.0.0.1:28825/ext/bc/26bzCyLxm6sB2J8fWdoiimxjB5tzuRAkaMoShGEur3AMwGqw3o/rpc")
 	panicErr(err)
 
 	b, err := ec.ChainID(context.Background())
@@ -80,7 +80,7 @@ func main() {
 
 	confirm(ec, deployTx.Hash())
 
-	user.GasLimit = 500_000
+	user.GasLimit = 1_000_000
 	tx, err := testContract.TestMedian(user, []*big.Int{big.NewInt(5), big.NewInt(10), big.NewInt(3), big.NewInt(7), big.NewInt(12)})
 	panicErr(err)
 	confirm(ec, tx.Hash())

@@ -20,6 +20,7 @@ interface MatrixMult{
 }
 interface IPFSMoment{
     function getMoment(string memory ipfsHash, uint256 moment) external view returns (uint256);
+}
 interface Fit {
     function fit(
         uint256 fitType,
