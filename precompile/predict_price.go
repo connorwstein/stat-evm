@@ -1,15 +1,17 @@
 package precompile
 
 import (
-	"encoding/csv"
+	"context"
 	"errors"
 	"fmt"
+	"log"
 	"math/big"
 	"os"
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/rocketlaunchr/dataframe-go/imports"
 )
 
 type ContractPredictPriceConfig struct {
@@ -94,28 +96,18 @@ func predictPrice(
 	if !ok {
 		return nil, suppliedGas, errors.New("invalid val")
 	}
-	csvFile, err := os.Open("./ETHUSD.csv")
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println("Successfully Opened CSV file")
-	defer csvFile.Close()
 	fmt.Println(v1)
-
-	csvLines, err := csv.NewReader(csvFile).ReadAll()
 	if err != nil {
 		fmt.Println(err)
 	}
-	var output []historicalData
-	for _, line := range csvLines {
-		s := historicalData{
-			Date:  line[0],
-			Price: line[4],
-		}
-		output = append(output, s)
+	ctx := context.TODO()
+	csvfile, err := os.Open("./ETHUSD.csv")
+	if err != nil {
+		log.Fatal(err)
 	}
-	fmt.Println(output)
-
+	df, err := imports.LoadFromCSV(ctx, csvfile)
+	// fmt.Println(df)
+	fmt.Print(df.Table())
 	return ret, suppliedGas, nil
 }
 
