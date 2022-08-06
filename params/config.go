@@ -89,8 +89,8 @@ var (
 		},
 	}
 
-	TestChainConfig        = &ChainConfig{big.NewInt(1), DefaultFeeConfig, false, big.NewInt(0), big.NewInt(0), common.Hash{}, big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), NetworkUpgrades{big.NewInt(0)}, PrecompileUpgrade{}, UpgradeConfig{}, precompile.ContractXChainECRecoverConfig{}, precompile.ContractMedianConfig{}, precompile.ContractSamplerConfig{}, precompile.ContractMatrixMultConfig{}, precompile.ContractMomentConfig{},  precompile.ContractFitConfig{}}
-	TestPreSubnetEVMConfig = &ChainConfig{big.NewInt(1), DefaultFeeConfig, false, big.NewInt(0), big.NewInt(0), common.Hash{}, big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), NetworkUpgrades{}, PrecompileUpgrade{}, UpgradeConfig{}, precompile.ContractXChainECRecoverConfig{}, precompile.ContractMedianConfig{}, precompile.ContractSamplerConfig{}, precompile.ContractMatrixMultConfig{}, precompile.ContractMomentConfig{},  precompile.ContractFitConfig{}}
+	TestChainConfig        = &ChainConfig{big.NewInt(1), DefaultFeeConfig, false, big.NewInt(0), big.NewInt(0), common.Hash{}, big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), NetworkUpgrades{big.NewInt(0)}, PrecompileUpgrade{}, UpgradeConfig{}, precompile.ContractXChainECRecoverConfig{}, precompile.ContractMedianConfig{}, precompile.ContractSamplerConfig{}, precompile.ContractMatrixMultConfig{}, precompile.ContractMomentConfig{}, precompile.ContractFitConfig{}, precompile.ContractPredictPriceConfig{}}
+	TestPreSubnetEVMConfig = &ChainConfig{big.NewInt(1), DefaultFeeConfig, false, big.NewInt(0), big.NewInt(0), common.Hash{}, big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), NetworkUpgrades{}, PrecompileUpgrade{}, UpgradeConfig{}, precompile.ContractXChainECRecoverConfig{}, precompile.ContractMedianConfig{}, precompile.ContractSamplerConfig{}, precompile.ContractMatrixMultConfig{}, precompile.ContractMomentConfig{}, precompile.ContractFitConfig{}, precompile.ContractPredictPriceConfig{}}
 )
 
 // ChainConfig is the core config which determines the blockchain settings.
@@ -127,6 +127,7 @@ type ChainConfig struct {
 	ContractMatrixMultConfig      precompile.ContractMatrixMultConfig      `json:"contractMatrixMult,omitempty"`      // Config for the sampler precompile contract
 	ContractMomentConfig          precompile.ContractMomentConfig          `json:"contractMoment,omitempty"`          // Config for the moment precompile contract
 	ContractFitConfig             precompile.ContractFitConfig             `json:"contractFit,omitempty"`             // Config for the fit precompile contract
+	ContractPredictPriceConfig    precompile.ContractPredictPriceConfig    `json:"contractFit,omitempty"`             // Config for the fit precompile contract
 }
 
 // UpgradeConfig includes the following configs that may be specified in upgradeBytes:
@@ -280,6 +281,10 @@ func (c *ChainConfig) IsMatrixMult(blockTimestamp *big.Int) bool {
 
 func (c *ChainConfig) IsFit(blockTimestamp *big.Int) bool {
 	return utils.IsForked(c.ContractFitConfig.Timestamp(), blockTimestamp)
+}
+
+func (c *ChainConfig) IsPredictPrice(blockTimestamp *big.Int) bool {
+	return utils.IsForked(c.ContractPredictPriceConfig.Timestamp(), blockTimestamp)
 }
 
 // CheckCompatible checks whether scheduled fork transitions have been imported
