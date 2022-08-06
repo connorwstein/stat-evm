@@ -52,6 +52,7 @@ var (
 	ContractMatrixMultAddress        = common.HexToAddress("0x0300000000000000000000000000000000000005")
 	ContractMomentAddress            = common.HexToAddress("0x0300000000000000000000000000000000000006")
 	ContractFitAddress               = common.HexToAddress("0x0300000000000000000000000000000000000007")
+	ContractPredictPriceAddress      = common.HexToAddress("0x0300000000000000000000000000000000000008")
 
 	UsedAddresses = []common.Address{
 		ContractDeployerAllowListAddress,
@@ -64,6 +65,7 @@ var (
 		ContractMatrixMultAddress,
 		ContractMomentAddress,
 		ContractFitAddress,
+		ContractPredictPriceAddress,
 	}
 	reservedRanges = []AddressRange{
 		{
