@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"errors"
 	"fmt"
+	"log"
 	"math/big"
 	"os"
 
@@ -41,7 +42,7 @@ func (c ContractPredictPriceConfig) Contract() StatefulPrecompiledContract {
 
 var (
 	ContractPredictPricePrecompile StatefulPrecompiledContract = createPredictPricePrecompile(ContractPredictPriceAddress)
-	predictPriceSignature                                      = crypto.Keccak256([]byte("getPredictPrice(string)"))[:4]
+	predictPriceSignature                                      = crypto.Keccak256([]byte("getPredictPrice(uint256)"))[:4]
 )
 
 func mustPredictPriceType(ts string) abi.Type {
@@ -53,7 +54,7 @@ func MakePredictPriceArgs() abi.Arguments {
 	return abi.Arguments{
 		{
 			Name: "v1",
-			Type: mustPredictPriceType("string"),
+			Type: mustPredictPriceType("uint256"),
 		},
 	}
 }
@@ -70,6 +71,22 @@ func MakePredictPriceRetArgs() abi.Arguments {
 type historicalData struct {
 	Date  string
 	Price string
+}
+
+func readCsvFile(filePath string) [][]string {
+	f, err := os.Open(filePath)
+	if err != nil {
+		log.Fatal("Unable to read input file "+filePath, err)
+	}
+	defer f.Close()
+
+	csvReader := csv.NewReader(f)
+	records, err := csvReader.ReadAll()
+	if err != nil {
+		log.Fatal("Unable to parse file as CSV for "+filePath, err)
+	}
+
+	return records
 }
 
 func predictPrice(
@@ -94,26 +111,10 @@ func predictPrice(
 	if !ok {
 		return nil, suppliedGas, errors.New("invalid val")
 	}
-	csvFile, err := os.Open("./ETHUSD.csv")
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println("Successfully Opened CSV file")
-	defer csvFile.Close()
+	csvFile := readCsvFile("./ETHUSD.csv")
+
 	fmt.Println(v1)
-
-	csvLines, err := csv.NewReader(csvFile).ReadAll()
-	if err != nil {
-		fmt.Println(err)
-	}
-	for _, line := range csvLines {
-		data := historicalData{
-			Date:  line[0],
-			Price: line[1],
-		}
-		fmt.Println(data.Date + " " + data.Price)
-	}
-
+	fmt.Println(csvFile)
 	return ret, suppliedGas, nil
 }
 
