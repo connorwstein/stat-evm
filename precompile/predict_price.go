@@ -16,6 +16,7 @@ import (
 	"github.com/rocketlaunchr/dataframe-go"
 	"github.com/rocketlaunchr/dataframe-go/imports"
 	"gonum.org/v1/gonum/stat"
+	"gonum.org/v1/gonum/stat/distuv"
 )
 
 type ContractPredictPriceConfig struct {
@@ -136,11 +137,30 @@ func predictPrice(
 		output = append(output, floatNum)
 	}
 	df.Unlock()
-	mean_res := stat.Mean(output, nil)
-	fmt.Println("Mu", mean_res)
+	sigma := stat.Mean(output, nil)
+	fmt.Println("Mu", sigma)
 	variance := stat.Variance(output, nil)
-	stddev := math.Sqrt(variance)
-	fmt.Println("Sigma", stddev)
+	mu := math.Sqrt(variance)
+	fmt.Println("Sigma", mu)
+	spot := output[len(output)-1]
+	fmt.Println("Spot is", spot)
+	dist := distuv.Normal{
+		Mu:    mu,    // Mean of the normal distribution
+		Sigma: sigma, // Standard deviation of the normal distribution
+	}
+	random := dist.Rand()
+
+	nTimeStep := 10
+	counter := 0
+	var pricePredictions []float64
+	pricePredictions = append(pricePredictions, math.Log(spot))
+	for counter < nTimeStep {
+		res := math.Sqrt(1) * sigma * random
+		val := mu + res
+		pricePredictions = append(pricePredictions, val)
+		counter++
+	}
+	fmt.Println("Got res num", pricePredictions)
 	return ret, suppliedGas, nil
 }
 
