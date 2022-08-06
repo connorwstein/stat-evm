@@ -86,6 +86,10 @@ func getIPFSMoment(
 	if !ok {
 		return nil, suppliedGas, vm.ErrExecutionReverted
 	}
+	moment, ok := valsI[1].(*big.Int)
+	if !ok {
+		return nil, suppliedGas, vm.ErrExecutionReverted
+	}
 	data, err := http.Get(fmt.Sprintf("http://127.0.0.1:8080/ipfs/%s", ipfsHash))
 	if err != nil {
 		// TODO: return custom error to drop tx and maybe do some custom "failed data query billing from the sender"?
@@ -93,18 +97,18 @@ func getIPFSMoment(
 	}
 	r := csv.NewReader(data.Body)
 	rows, err := r.ReadAll()
-	var rawMoment int
-	for row := 0; row < len(rows); row++ {
+	var rawMoment int64
+	for row := 1; row < len(rows); row++ { // Assume always first row is headings?
 		for col := 0; col < len(rows[row]); col++ {
 			i, err := strconv.Atoi(rows[row][col])
 			if err != nil {
 				// TODO: return custom error to drop tx and maybe do some custom "failed data query billing from the sender"?
 				return nil, remainingGas, err
 			}
-			rawMoment += i
+			rawMoment += big.NewInt(0).Exp(big.NewInt(int64(i)), moment, nil).Int64()
 		}
 	}
-	ret, err = MakeRetArgs().PackValues([]interface{}{big.NewInt(int64(rawMoment))})
+	ret, err = MakeRetArgs().PackValues([]interface{}{big.NewInt(rawMoment)})
 	if err != nil {
 		return nil, suppliedGas, err
 	}
