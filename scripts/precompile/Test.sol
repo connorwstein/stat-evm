@@ -20,21 +20,30 @@ interface MatrixMult{
 }
 interface IPFSMoment{
     function getMoment(string memory ipfsHash, uint256 moment) external view returns (uint256);
+interface Fit {
+    function fit(
+        uint256 fitType,
+        int256[][] memory X,
+        int256[][] memory Y
+    ) external view returns (int256[][] calldata); // TODO: Should this be `memory`?
 }
 
 contract Test {
     uint256 public med;
     uint256 public moment;
     int256[] public sample;
-    int256[][] product;
+    int256[][] public product;
+    int256[][] public fitted;
     uint256 public ipfsMomentRes;
-    
+
     event Debug(string message, int256 res);
+
     Median prec = Median(0x0300000000000000000000000000000000000001);
     Sampler sampler = Sampler(0x0300000000000000000000000000000000000004);
     Moment moment_prec = Moment(0x0300000000000000000000000000000000000006);
     MatrixMult matrixMult = MatrixMult(0x0300000000000000000000000000000000000005);
     IPFSMoment ipfsMoment = IPFSMoment(0x0300000000000000000000000000000000000008);
+    Fit fit = Fit(0x0300000000000000000000000000000000000007);
 
     function testMedian(uint256[] memory vals) public {
         med = prec.getMedian(vals);
@@ -62,5 +71,13 @@ contract Test {
 
     function getMatrixMulti() public view returns (int256[][] memory) {
         return product;
+    }
+
+    function testFit(uint256 fitType, int256[][] memory X, int256[][] memory Y) public {
+        fitted = fit.fit(fitType, X, Y);
+    }
+
+    function getFitted() public view returns (int256[][] memory) {
+        return fitted;
     }
 }

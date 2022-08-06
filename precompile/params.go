@@ -14,8 +14,11 @@ const (
 	writeGasCostPerSlot = 20_000
 	readGasCostPerSlot  = 5_000
 	XChainECRecoverCost = 10_000
-	MedianCost          = 10_000
-	SamplerCost         = 10_000
+	// TODO: What are these and are they required?
+	MedianCost    = 10_000
+	SamplerCost   = 10_000
+	MatrixMulCost = 10_000
+	FitCost       = 10_000
 
 	ModifyAllowListGasCost = writeGasCostPerSlot
 	ReadAllowListGasCost   = readGasCostPerSlot
