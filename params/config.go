@@ -127,7 +127,7 @@ type ChainConfig struct {
 	ContractMatrixMultConfig      precompile.ContractMatrixMultConfig      `json:"contractMatrixMult,omitempty"`      // Config for the sampler precompile contract
 	ContractMomentConfig          precompile.ContractMomentConfig          `json:"contractMoment,omitempty"`          // Config for the moment precompile contract
 	ContractFitConfig             precompile.ContractFitConfig             `json:"contractFit,omitempty"`             // Config for the fit precompile contract
-	ContractPredictPriceConfig    precompile.ContractPredictPriceConfig    `json:"contractFit,omitempty"`             // Config for the fit precompile contract
+	ContractPredictPriceConfig    precompile.ContractPredictPriceConfig    `json:"contractPredictPrice,omitempty"`    // Config for the fit precompile contract
 }
 
 // UpgradeConfig includes the following configs that may be specified in upgradeBytes:
@@ -526,6 +526,7 @@ type Rules struct {
 	IsContractMatrixMultEnabled      bool
 	IsContractMomentEnabled          bool
 	IsContractFitEnabled             bool
+	IsContractPredictPriceEnabled    bool
 
 	// Precompiles maps addresses to stateful precompiled contracts that are enabled
 	// for this rule set.
@@ -569,6 +570,7 @@ func (c *ChainConfig) AvalancheRules(blockNum, blockTimestamp *big.Int) Rules {
 	rules.IsContractMomentEnabled = c.IsSampler(blockTimestamp)
 	rules.IsContractMatrixMultEnabled = c.IsMatrixMult(blockTimestamp)
 	rules.IsContractFitEnabled = c.IsFit(blockTimestamp)
+	rules.IsContractPredictPriceEnabled = c.IsFit(blockTimestamp)
 
 	// Initialize the stateful precompiles that should be enabled at [blockTimestamp].
 	rules.Precompiles = make(map[common.Address]precompile.StatefulPrecompiledContract)

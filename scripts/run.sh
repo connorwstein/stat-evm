@@ -141,6 +141,9 @@ if [[ ${E2E} != true ]]; then
     },
     "contractMoment": {
       "blockTimestamp": 0
+    },
+    "contractPredictPrice": {
+      "blockTimestamp": 0
     }
   },
   "alloc": {
