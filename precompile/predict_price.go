@@ -14,6 +14,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/rocketlaunchr/dataframe-go"
+	"github.com/rocketlaunchr/dataframe-go/forecast/interpolation"
 	"github.com/rocketlaunchr/dataframe-go/imports"
 	"gonum.org/v1/gonum/stat"
 	"gonum.org/v1/gonum/stat/distuv"
@@ -123,6 +124,7 @@ func predictPrice(
 		log.Fatal(err)
 	}
 	df, err := imports.LoadFromCSV(ctx, csvfile)
+
 	iterator := df.ValuesIterator(dataframe.ValuesOptions{0, 1, true})
 	df.Lock()
 	var output []float64
@@ -131,36 +133,72 @@ func predictPrice(
 		if row == nil {
 			break
 		}
-		fmt.Println(vals[0], vals[4])
+
 		f := vals[4].(string)
 		floatNum, _ := strconv.ParseFloat(f, 32)
 		output = append(output, floatNum)
 	}
 	df.Unlock()
+	opts := interpolation.InterpolateOptions{
+		Method:        interpolation.ForwardFill{},
+		FillDirection: interpolation.Forward,
+		Limit:         &[]int{1}[0],
+		FillRegion:    nil,
+		InPlace:       true,
+	}
+	interpolated_data, err := interpolation.Interpolate(ctx, output, opts)
+	fmt.Println("interpolated_data", interpolated_data)
 	sigma := stat.Mean(output, nil)
-	fmt.Println("Mu", sigma)
-	variance := stat.Variance(output, nil)
-	mu := math.Sqrt(variance)
-	fmt.Println("Sigma", mu)
+	fmt.Println("Sigma", sigma)
+	a1 := output[1:]
+
+	//TODO INTERPOLATION
+	// GET MU
+	// GET SIGMA
+	a2 := output[:len(output)-1]
+	var ret_val []float64
+	for i := 0; i < len(a1); i++ {
+		ret_val = append(ret_val, a1[i]/a2[i]-1)
+	}
+	fmt.Println("ret_val", ret_val)
+	mu := stat.Mean(ret_val, nil)
+	fmt.Println("mu", mu)
+
 	spot := output[len(output)-1]
 	fmt.Println("Spot is", spot)
-	dist := distuv.Normal{
-		Mu:    mu,    // Mean of the normal distribution
-		Sigma: sigma, // Standard deviation of the normal distribution
-	}
-	random := dist.Rand()
 
 	nTimeStep := 10
-	counter := 0
 	var pricePredictions []float64
-	pricePredictions = append(pricePredictions, math.Log(spot))
-	for counter < nTimeStep {
-		res := math.Sqrt(1) * sigma * random
-		val := mu + res
-		pricePredictions = append(pricePredictions, val)
-		counter++
+	pricePredictions_ := make([]float64, nTimeStep)
+	pricePredictions_ = append(pricePredictions, math.Log(spot))
+	pricePredictions_[0] = math.Log(spot)
+	for i, v := range pricePredictions_ {
+		dist := distuv.Normal{
+			Mu:    mu,    // Mean of the normal distribution
+			Sigma: sigma, // Standard deviation of the normal distribution
+		}
+		random := dist.Rand()
+		if i == 0 {
+			prevPrice := pricePredictions_[i]
+			fmt.Println("Prev val is", prevPrice)
+			fmt.Println("rand val is", random)
+			res := math.Sqrt(1) * sigma * random
+			fmt.Println("calc mu is", mu)
+			fmt.Println("calc sigma is", sigma)
+			fmt.Println("calc res is", res)
+			val := mu + res + prevPrice
+			fmt.Println("calc val is", val)
+			pricePredictions_ = append(pricePredictions_, val)
+		} else {
+			prevPrice := pricePredictions_[i-1]
+			fmt.Println("Prev val is", prevPrice)
+			res := math.Sqrt(1) * sigma * random
+			val := mu + res + prevPrice
+			pricePredictions_ = append(pricePredictions_, val)
+		}
+		fmt.Println("here", v, i)
 	}
-	fmt.Println("Got res num", pricePredictions)
+	fmt.Println(pricePredictions_)
 	return ret, suppliedGas, nil
 }
 
