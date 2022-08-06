@@ -12,7 +12,10 @@ interface Sampler {
         uint256 numSamples
     ) external view returns (int256[] calldata); // TODO: Should this be `memory`?
 }
-interface MatrixMult {
+interface Moment {
+    function getMoment(uint256 v1, uint256[] memory v2, uint256[] memory v3) external view returns (uint256);
+}
+interface MatrixMult{
     function matrixMultiply(int256[][] memory a, int256[][] memory b) external view returns (int256[][] memory);
 }
 interface Fit {
@@ -25,6 +28,7 @@ interface Fit {
 
 contract Test {
     uint256 public med;
+    uint256 public moment;
     int256[] public sample;
     int256[][] public product;
     int256[][] public fitted;
@@ -33,8 +37,9 @@ contract Test {
 
     Median prec = Median(0x0300000000000000000000000000000000000001);
     Sampler sampler = Sampler(0x0300000000000000000000000000000000000004);
+    Moment moment_prec = Moment(0x0300000000000000000000000000000000000006);
     MatrixMult matrixMult = MatrixMult(0x0300000000000000000000000000000000000005);
-    Fit fit = Fit(0x0300000000000000000000000000000000000006);
+    Fit fit = Fit(0x0300000000000000000000000000000000000007);
 
     function testMedian(uint256[] memory vals) public {
         med = prec.getMedian(vals);
@@ -46,6 +51,10 @@ contract Test {
 
     function getLastSample() public view returns (int256[] memory) {
         return sample;
+    }
+
+    function testMoment(uint256 v1,uint256[] memory v2, uint256[] memory v3) public {
+        moment = moment_prec.getMoment(v1, v2, v3);
     }
 
     function testMatrixMult(int256[][] memory a, int256[][] memory b) public {

@@ -138,6 +138,9 @@ if [[ ${E2E} != true ]]; then
     },
     "contractFit": {
       "blockTimestamp": 0
+    },
+    "contractMoment": {
+      "blockTimestamp": 0
     }
   },
   "alloc": {

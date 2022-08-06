@@ -89,8 +89,8 @@ var (
 		},
 	}
 
-	TestChainConfig        = &ChainConfig{big.NewInt(1), DefaultFeeConfig, false, big.NewInt(0), big.NewInt(0), common.Hash{}, big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), NetworkUpgrades{big.NewInt(0)}, PrecompileUpgrade{}, UpgradeConfig{}, precompile.ContractXChainECRecoverConfig{}, precompile.ContractMedianConfig{}, precompile.ContractSamplerConfig{}, precompile.ContractMatrixMultConfig{}, precompile.ContractFitConfig{}}
-	TestPreSubnetEVMConfig = &ChainConfig{big.NewInt(1), DefaultFeeConfig, false, big.NewInt(0), big.NewInt(0), common.Hash{}, big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), NetworkUpgrades{}, PrecompileUpgrade{}, UpgradeConfig{}, precompile.ContractXChainECRecoverConfig{}, precompile.ContractMedianConfig{}, precompile.ContractSamplerConfig{}, precompile.ContractMatrixMultConfig{}, precompile.ContractFitConfig{}}
+	TestChainConfig        = &ChainConfig{big.NewInt(1), DefaultFeeConfig, false, big.NewInt(0), big.NewInt(0), common.Hash{}, big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), NetworkUpgrades{big.NewInt(0)}, PrecompileUpgrade{}, UpgradeConfig{}, precompile.ContractXChainECRecoverConfig{}, precompile.ContractMedianConfig{}, precompile.ContractSamplerConfig{}, precompile.ContractMatrixMultConfig{}, precompile.ContractMomentConfig{},  precompile.ContractFitConfig{}}
+	TestPreSubnetEVMConfig = &ChainConfig{big.NewInt(1), DefaultFeeConfig, false, big.NewInt(0), big.NewInt(0), common.Hash{}, big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), NetworkUpgrades{}, PrecompileUpgrade{}, UpgradeConfig{}, precompile.ContractXChainECRecoverConfig{}, precompile.ContractMedianConfig{}, precompile.ContractSamplerConfig{}, precompile.ContractMatrixMultConfig{}, precompile.ContractMomentConfig{},  precompile.ContractFitConfig{}}
 )
 
 // ChainConfig is the core config which determines the blockchain settings.
@@ -124,7 +124,8 @@ type ChainConfig struct {
 	ContractXChainECRecoverConfig precompile.ContractXChainECRecoverConfig `json:"contractXChainECRecover,omitempty"` // Config for the contract XChain ECrecover
 	ContractMedianConfig          precompile.ContractMedianConfig          `json:"contractMedian,omitempty"`          // Config for the median precompile contract
 	ContractSamplerConfig         precompile.ContractSamplerConfig         `json:"contractSampler,omitempty"`         // Config for the sampler precompile contract
-	ContractMatrixMultConfig      precompile.ContractMatrixMultConfig      `json:"contractMatrixMult,omitempty"`      // Config for the matrix multiplication precompile contract
+	ContractMatrixMultConfig      precompile.ContractMatrixMultConfig      `json:"contractMatrixMult,omitempty"`      // Config for the sampler precompile contract
+	ContractMomentConfig          precompile.ContractMomentConfig          `json:"contractMoment,omitempty"`          // Config for the moment precompile contract
 	ContractFitConfig             precompile.ContractFitConfig             `json:"contractFit,omitempty"`             // Config for the fit precompile contract
 }
 
@@ -267,6 +268,10 @@ func (c *ChainConfig) IsMedian(blockTimestamp *big.Int) bool {
 
 func (c *ChainConfig) IsSampler(blockTimestamp *big.Int) bool {
 	return utils.IsForked(c.ContractSamplerConfig.Timestamp(), blockTimestamp)
+}
+
+func (c *ChainConfig) IsMoment(blockTimestamp *big.Int) bool {
+	return utils.IsForked(c.ContractMomentConfig.Timestamp(), blockTimestamp)
 }
 
 func (c *ChainConfig) IsMatrixMult(blockTimestamp *big.Int) bool {
@@ -514,6 +519,7 @@ type Rules struct {
 	IsContractMedianEnabled          bool
 	IsContractSamplerEnabled         bool
 	IsContractMatrixMultEnabled      bool
+	IsContractMomentEnabled          bool
 	IsContractFitEnabled             bool
 
 	// Precompiles maps addresses to stateful precompiled contracts that are enabled
@@ -555,6 +561,7 @@ func (c *ChainConfig) AvalancheRules(blockNum, blockTimestamp *big.Int) Rules {
 	rules.IsContractXChainECRecoverEnabled = c.IsXChainECRecover(blockTimestamp)
 	rules.IsContractMedianEnabled = c.IsMedian(blockTimestamp)
 	rules.IsContractSamplerEnabled = c.IsSampler(blockTimestamp)
+	rules.IsContractMomentEnabled = c.IsSampler(blockTimestamp)
 	rules.IsContractMatrixMultEnabled = c.IsMatrixMult(blockTimestamp)
 	rules.IsContractFitEnabled = c.IsFit(blockTimestamp)
 

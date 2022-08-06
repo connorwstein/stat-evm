@@ -26,7 +26,6 @@ func TestFit(t *testing.T) {
 
 	ret, _, err := fit(nil, common.Address{}, common.Address{}, input, 0, false)
 	require.NoError(t, err)
-	fmt.Println(ret)
 
 	vals, err := MakeFitReturnArgs().UnpackValues(ret)
 	require.NoError(t, err)
