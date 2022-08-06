@@ -9,7 +9,7 @@ import (
 )
 
 func TestFit(t *testing.T) {
-	a, err := MakeFitArgs().PackValues([]interface{}{[]*big.Int{big.NewInt(10), big.NewInt(2), big.NewInt(3)}})
+	a, err := MakeFitArgs().PackValues([]interface{}{[]*big.Int{big.NewInt(1), big.NewInt(1), big.NewInt(2), big.NewInt(3), big.NewInt(3), big.NewInt(2)}})
 	require.NoError(t, err)
 	//t.Log(hexutil.Encode(a[:]))
 	res, _, err := fit(nil, common.Address{}, common.Address{}, a, 0, false)
