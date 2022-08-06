@@ -1,12 +1,12 @@
 package precompile
 
 import (
-	"fmt"
 	"math/big"
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/stretchr/testify/require"
+	"gotest.tools/assert"
 )
 
 func TestFit(t *testing.T) {
@@ -30,5 +30,5 @@ func TestFit(t *testing.T) {
 	vals, err := MakeFitReturnArgs().UnpackValues(ret)
 	require.NoError(t, err)
 
-	fmt.Println(vals[0].([][]*big.Int)) // Should return [[2]]
+	assert.Equal(t, int(vals[0].([][]*big.Int)[0][0].Int64()), 2) // Should equal [[2]]
 }

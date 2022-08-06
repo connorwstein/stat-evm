@@ -126,6 +126,7 @@ func specificFit(
 	perc.Div(perc, denom)
 	// fitb := 100 * (3*(v1*v2+v3*v4+v5*v6) - (v1+v3+v5)*(v2+v4+v6)) / (3*(v1*v1+v3*v3+v5*v5) - (v1+v3+v5)*(v1+v3+v5))
 	// fita := 100*(v2+v4+v6)/3 - fitb*(v1+v3+v5)/3
+
 	retb, err = MakeFitReturnArgs().PackValues([]interface{}{perc})
 	if err != nil {
 		return nil, suppliedGas, err
