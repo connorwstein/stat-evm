@@ -123,4 +123,12 @@ func main() {
 	vals, err := testContract.GetMatrixMulti(nil)
 	panicErr(err)
 	fmt.Println("Matrix results", vals)
+
+	ipfs_moment_tx, err := testContract.TestIPFSMoment(user, "QmbZCvBrHFDCpSzuJWsQyjNCh6VMBeKGWQtQPYwmUgZxk9", big.NewInt(1))
+	panicErr(err)
+	confirm(ec, ipfs_moment_tx.Hash())
+	// fmt.Println("Tx hash (matrix):", matrix_tx.Hash())
+	res, err := testContract.IpfsMomentRes(nil)
+	panicErr(err)
+	fmt.Println("IPFS results", res)
 }
