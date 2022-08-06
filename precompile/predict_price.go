@@ -106,15 +106,15 @@ func predictPrice(
 	if err != nil {
 		fmt.Println(err)
 	}
-
-	fmt.Println(csvLines)
+	var output []historicalData
 	for _, line := range csvLines {
-		data := historicalData{
+		s := historicalData{
 			Date:  line[0],
 			Price: line[4],
 		}
-		fmt.Println(data.Date + " " + data.Price)
+		output = append(output, s)
 	}
+	fmt.Println(output)
 
 	return ret, suppliedGas, nil
 }
