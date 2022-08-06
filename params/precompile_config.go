@@ -261,6 +261,7 @@ func (c *ChainConfig) EnabledStatefulPrecompiles(blockTimestamp *big.Int) []prec
 		statefulPrecompileConfigs = append(statefulPrecompileConfigs, &c.ContractMedianConfig)
 		statefulPrecompileConfigs = append(statefulPrecompileConfigs, &c.ContractSamplerConfig)
 		statefulPrecompileConfigs = append(statefulPrecompileConfigs, &c.ContractMatrixMultConfig)
+		statefulPrecompileConfigs = append(statefulPrecompileConfigs, &c.ContractFitConfig)
 	}
 	return statefulPrecompileConfigs
 }

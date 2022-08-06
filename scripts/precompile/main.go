@@ -60,7 +60,7 @@ func start_events(ec *ethclient.Client, addr common.Address) {
 }
 
 func main() {
-	ec, err := ethclient.Dial("http://127.0.0.1:13575/ext/bc/2QN6VdY4XxrxQvXcQBdaqTaMZkr2cdJnA5CE8W6MYyHt4Bw7fo/rpc")
+	ec, err := ethclient.Dial("http://127.0.0.1:21448/ext/bc/2CufKpuec6sD5BCrZUtM76MMKSjfCUS9u31LnyUKU4yEUTdGzV/rpc")
 	panicErr(err)
 
 	b, err := ec.ChainID(context.Background())
@@ -109,7 +109,27 @@ func main() {
 	panicErr(err)
 	confirm(ec, matrix_tx.Hash())
 	fmt.Println("Tx hash (matrix):", matrix_tx.Hash())
+
 	vals, err := testContract.GetMatrixMulti(nil)
 	panicErr(err)
 	fmt.Println(vals)
+
+	var x [][]*big.Int
+	var y [][]*big.Int
+	for i := 0; i < 100; i++ {
+		val := big.NewInt(int64(i + 1))
+		val_times_two := new(big.Int).Mul(val, big.NewInt(2))
+		x = append(x, []*big.Int{val})
+		y = append(y, []*big.Int{val_times_two})
+	}
+
+	fitType := big.NewInt(0) // 0 = OLS, 1 = LASSO
+	fit_tx, err := testContract.TestFit(user, fitType, x, y)
+	panicErr(err)
+	confirm(ec, fit_tx.Hash())
+	fmt.Println("Tx hash (fit):", fit_tx.Hash())
+
+	fit_vals, err := testContract.GetFitted(nil)
+	panicErr(err)
+	fmt.Println(fit_vals)
 }

@@ -14,8 +14,11 @@ const (
 	writeGasCostPerSlot = 20_000
 	readGasCostPerSlot  = 5_000
 	XChainECRecoverCost = 10_000
-	MedianCost          = 10_000
-	SamplerCost         = 10_000
+	// TODO: What are these and are they required?
+	MedianCost    = 10_000
+	SamplerCost   = 10_000
+	MatrixMulCost = 10_000
+	FitCost       = 10_000
 
 	ModifyAllowListGasCost = writeGasCostPerSlot
 	ReadAllowListGasCost   = readGasCostPerSlot
@@ -47,6 +50,7 @@ var (
 	ContractMedianAddress            = common.HexToAddress("0x0300000000000000000000000000000000000001")
 	ContractSamplerAddress           = common.HexToAddress("0x0300000000000000000000000000000000000004")
 	ContractMatrixMultAddress        = common.HexToAddress("0x0300000000000000000000000000000000000005")
+	ContractFitAddress               = common.HexToAddress("0x0300000000000000000000000000000000000006")
 
 	UsedAddresses = []common.Address{
 		ContractDeployerAllowListAddress,
@@ -57,6 +61,7 @@ var (
 		ContractMedianAddress,
 		ContractSamplerAddress,
 		ContractMatrixMultAddress,
+		ContractFitAddress,
 	}
 	reservedRanges = []AddressRange{
 		{

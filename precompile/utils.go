@@ -5,13 +5,15 @@ package precompile
 
 import (
 	"fmt"
+	"math/big"
 	"regexp"
 
+	"github.com/ava-labs/subnet-evm/vmerrs"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 
-	"github.com/ava-labs/subnet-evm/vmerrs"
+	"gonum.org/v1/gonum/mat"
 )
 
 var functionSignatureRegex = regexp.MustCompile(`[\w]+\(((([\w]+)?)|((([\w]+),)+([\w]+)))\)`)
@@ -19,6 +21,16 @@ var functionSignatureRegex = regexp.MustCompile(`[\w]+\(((([\w]+)?)|((([\w]+),)+
 func mustType(ts string) abi.Type {
 	ty, _ := abi.NewType(ts, "", nil)
 	return ty
+}
+
+func buildMatrix(a [][]*big.Int) *mat.Dense {
+	var data []float64
+	for row := 0; row < len(a); row++ {
+		for col := 0; col < len(a[row]); col++ {
+			data = append(data, float64(a[row][col].Int64()))
+		}
+	}
+	return mat.NewDense(len(a), len(a[0]), data)
 }
 
 // CalculateFunctionSelector returns the 4 byte function selector that results from [functionSignature]

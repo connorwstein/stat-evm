@@ -135,6 +135,9 @@ if [[ ${E2E} != true ]]; then
     },
     "contractMatrixMult": {
       "blockTimestamp": 0
+    },
+    "contractFit": {
+      "blockTimestamp": 0
     }
   },
   "alloc": {
