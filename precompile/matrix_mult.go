@@ -1,6 +1,5 @@
 package precompile
 
-import "C"
 import (
 	"errors"
 	"math/big"
@@ -68,16 +67,6 @@ func MakeMatrixMultRetArgs() abi.Arguments {
 			Type: mustType("int256[][]"),
 		},
 	}
-}
-
-func buildMatrix(a [][]*big.Int) mat.Matrix {
-	var data []float64
-	for row := 0; row < len(a); row++ {
-		for col := 0; col < len(a[row]); col++ {
-			data = append(data, float64(a[row][col].Int64()))
-		}
-	}
-	return mat.NewDense(len(a), len(a[0]), data)
 }
 
 func matrixMult(

@@ -114,6 +114,9 @@ require (
 	github.com/oklog/run v1.1.0 // indirect
 	github.com/opentracing/opentracing-go v1.1.0 // indirect
 	github.com/otiai10/copy v1.7.0 // indirect
+	github.com/pa-m/optimize v0.0.0-20190612075243-15ee852a6d9a // indirect
+	github.com/pa-m/randomkit v0.0.0-20191001073902-db4fd80633df // indirect
+	github.com/pa-m/sklearn v0.0.0-20200711083454-beb861ee48b1 // indirect
 	github.com/pelletier/go-toml v1.9.4 // indirect
 	github.com/peterh/liner v1.1.1-0.20190123174540-a2c9a5303de7 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
@@ -137,6 +140,7 @@ require (
 	golang.org/x/exp v0.0.0-20220426173459-3bcf042a4bf5 // indirect
 	golang.org/x/net v0.0.0-20220607020251-c690dde0001d // indirect
 	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
+	golang.org/x/tools v0.1.10 // indirect
 	google.golang.org/genproto v0.0.0-20220602131408-e326c6e8e9c8 // indirect
 	google.golang.org/grpc v1.47.0 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
