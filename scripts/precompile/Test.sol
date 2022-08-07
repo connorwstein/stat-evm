@@ -18,6 +18,13 @@ interface Moment {
 interface MatrixMult{
     function matrixMultiply(int256[][] memory a, int256[][] memory b) external view returns (int256[][] memory);
 }
+interface IPFSMoment{
+    function getMoment(string memory ipfsHash, uint256 moment) external view returns (uint256);
+}
+interface IPFSFit{
+    function getFit(string memory ipfsHash, uint256 fitType) external view returns (int256[][] calldata, int256[] calldata);
+}
+
 interface Fit {
     function fit(
         uint256 fitType,
@@ -32,6 +39,10 @@ contract Test {
     int256[] public sample;
     int256[][] public product;
     int256[][] public fitted;
+    int256[][] public ipfsCoeffs;
+    int256[] public ipfsIntercepts;
+    uint256 public ipfsMomentRes;
+    int256 public predicted;
 
     event Debug(string message, int256 res);
 
@@ -39,6 +50,8 @@ contract Test {
     Sampler sampler = Sampler(0x0300000000000000000000000000000000000004);
     Moment moment_prec = Moment(0x0300000000000000000000000000000000000006);
     MatrixMult matrixMult = MatrixMult(0x0300000000000000000000000000000000000005);
+    IPFSMoment ipfsMoment = IPFSMoment(0x0300000000000000000000000000000000000008);
+    IPFSFit ipfsFit =          IPFSFit(0x0300000000000000000000000000000000000009);
     Fit fit = Fit(0x0300000000000000000000000000000000000007);
 
     function testMedian(uint256[] memory vals) public {
@@ -61,12 +74,36 @@ contract Test {
         product = matrixMult.matrixMultiply(a, b);
     }
 
+    function testIPFSMoment(string memory ipfsHash, uint256 moment) public {
+        ipfsMomentRes = ipfsMoment.getMoment(ipfsHash, moment);
+    }
+
+    function testIPFSFit(string memory ipfsHash, uint256 fitType) public {
+        (ipfsCoeffs, ipfsIntercepts) = ipfsFit.getFit(ipfsHash, fitType);
+    }
+
+    function getIPFSCoeffs() public view returns (int256[][] memory){
+        return ipfsCoeffs;
+    }
+
+    function getIPFSIntercepts() public view returns (int256[] memory){
+        return ipfsIntercepts;
+    }
+
     function getMatrixMulti() public view returns (int256[][] memory) {
         return product;
     }
 
     function testFit(uint256 fitType, int256[][] memory X, int256[][] memory Y) public {
         fitted = fit.fit(fitType, X, Y);
+    }
+
+    // Predict a single Y
+    function testPrediction(int256[][] memory dependentVars) public  {
+       int256[][] memory predictedNoIntercept = matrixMult.matrixMultiply(dependentVars, getIPFSCoeffs());
+       // Hack we expect only one val
+       int256[] memory intercepts =  getIPFSIntercepts();
+       predicted = predictedNoIntercept[0][0]/1e6+intercepts[0]/1e6;
     }
 
     function getFitted() public view returns (int256[][] memory) {
