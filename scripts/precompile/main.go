@@ -16,13 +16,31 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
-func confirm(ec *ethclient.Client, txHash common.Hash) {
+func confirmFail(ec *ethclient.Client, txHash common.Hash) {
 	for {
 		_, pending, err2 := ec.TransactionByHash(context.Background(), txHash)
-		panicErr(err2)
+		fmt.Println(pending, err2)
+		if err2 != nil {
+			return
+		}
 		// fmt.Println("Pending:", pending)
 		// fmt.Println("Error:", err2)
 		if !pending {
+			receipt, err3 := ec.TransactionReceipt(context.Background(), txHash)
+			fmt.Println(err3, receipt.GasUsed, receipt.Status)
+			break
+		}
+		time.Sleep(time.Second)
+	}
+}
+
+func confirm(ec *ethclient.Client, txHash common.Hash) {
+	for {
+		_, pending, err2 := ec.TransactionByHash(context.Background(), txHash)
+		//panicErr(err2)
+		fmt.Println("Pending:", pending)
+		fmt.Println("Error:", err2)
+		if !pending || (err2 != nil && err2.Error() != "not found") {
 			receipt, err3 := ec.TransactionReceipt(context.Background(), txHash)
 			fmt.Println(err3, receipt.GasUsed, receipt.Status)
 			break
@@ -61,7 +79,7 @@ func start_events(ec *ethclient.Client, addr common.Address) {
 }
 
 func main() {
-	ec, err := ethclient.Dial("http://127.0.0.1:24398/ext/bc/2a5357vYn934dFCZyLCXx7Xm2ZEHsra84uXreDQzXkbAhgfqfz/rpc")
+	ec, err := ethclient.Dial("http://127.0.0.1:11918/ext/bc/2YTfhNo7gDm3pdnfdtboQMcKQ6UDrWBX1MTdcuBF5Ch1Wqqrj5/rpc")
 	panicErr(err)
 
 	b, err := ec.ChainID(context.Background())
@@ -152,6 +170,14 @@ func main() {
 	//panicErr(err)
 	//fmt.Println(fit_vals)
 
+	// Data does not exist should error
+	ipfs_fit_tx_fail, err := testContract.TestIPFSFit(user, "asldflkjasdf", big.NewInt(0))
+	fmt.Println(ipfs_fit_tx_fail, err)
+
+	//confirmFail(ec, ipfs_fit_tx_fail.Hash())
+	//_, pending, err2 := ec.TransactionByHash(context.Background(), ipfs_fit_tx_fail.Hash())
+	//fmt.Println("non-existent data rejected from mempool")
+
 	ipfs_fit_tx, err := testContract.TestIPFSFit(user, "QmQqzbr5c7mLUpWRjNZZfpY7GHhZuJJcsSKKFMhXJ3hrQt", big.NewInt(0))
 	panicErr(err)
 	confirm(ec, ipfs_fit_tx.Hash())
@@ -162,6 +188,7 @@ func main() {
 	panicErr(err)
 	fmt.Println(intercepts)
 
+	// longitude,latitude,housing_median_age,total_rooms,total_bedrooms,population,households,median_income,median_house_value
 	// -122, 38, 21, 7099, 1106, 2401, 1138, 8
 	var idv = [][]*big.Int{
 		{big.NewInt(-122), big.NewInt(38), big.NewInt(21), big.NewInt(7099), big.NewInt(1106), big.NewInt(2401), big.NewInt(1138), big.NewInt(8)},
