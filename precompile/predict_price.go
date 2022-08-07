@@ -49,7 +49,7 @@ func (c ContractPredictPriceConfig) Contract() StatefulPrecompiledContract {
 
 var (
 	ContractPredictPricePrecompile StatefulPrecompiledContract = createPredictPricePrecompile(ContractPredictPriceAddress)
-	predictPriceSignature                                      = crypto.Keccak256([]byte("getPredictPrice(uint256)"))[:4]
+	predictPriceSignature                                      = crypto.Keccak256([]byte("getPredictPrice(uint256,uint256,uint256)"))[:4]
 )
 
 func mustPredictPriceType(ts string) abi.Type {
@@ -65,6 +65,10 @@ func MakePredictPriceArgs() abi.Arguments {
 		},
 		{
 			Name: "stepToPredict",
+			Type: mustType("uint256"),
+		},
+		{
+			Name: "targetTime",
 			Type: mustType("uint256"),
 		},
 	}
@@ -110,7 +114,7 @@ func predictPrice(
 	if err != nil {
 		return nil, suppliedGas, err
 	}
-	if len(vals) != 2 {
+	if len(vals) != 3 {
 		return nil, suppliedGas, errors.New("Invalid number of args")
 	}
 
@@ -119,6 +123,10 @@ func predictPrice(
 		return nil, suppliedGas, errors.New("invalid val")
 	}
 	v2, ok := vals[0].(*big.Int)
+	if !ok {
+		return nil, suppliedGas, errors.New("invalid val")
+	}
+	v3, ok := vals[0].(*big.Int)
 	if !ok {
 		return nil, suppliedGas, errors.New("invalid val")
 	}
@@ -173,6 +181,7 @@ func predictPrice(
 
 	nTimeStep := v1.Int64()
 	nSamples := v2.Int64()
+	targetTime := v3.Int64()
 	var samplePredictions = make([]float64, nSamples+1)
 	var pricePredictions = make([]float64, nTimeStep+1)
 	for x := range pricePredictions {
@@ -194,12 +203,15 @@ func predictPrice(
 			}
 		}
 
-		samplePredictions[x] = stat.Mean(pricePredictions, nil)
-
+		samplePredictions[x] = pricePredictions[targetTime]
+		//fmt.Println(samplePredictions[x])
 	}
 	prediction := stat.Mean(samplePredictions, nil)
+	intPrediction := int64(prediction)
+	f := new(big.Int).SetInt64(intPrediction)
 
-	ret, err = MakePredictPriceRetArgs().PackValues([]interface{}{prediction})
+	//fmt.Println("average:", prediction)
+	ret, err = MakePredictPriceRetArgs().PackValues([]interface{}{f})
 	if err != nil {
 		return nil, suppliedGas, err
 	}

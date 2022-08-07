@@ -9,10 +9,9 @@ import (
 )
 
 func TestPredictPrice(t *testing.T) {
-	input, err := MakePredictPriceArgs().Pack(big.NewInt(10), big.NewInt(10))
+	input, err := MakePredictPriceArgs().Pack(big.NewInt(10), big.NewInt(10), big.NewInt(10))
 	require.NoError(t, err)
-	med, _, _ := predictPrice(nil, common.Address{}, common.Address{}, input, 100_000, true)
-
+	prediction, _, _ := predictPrice(nil, common.Address{}, common.Address{}, input, 100_000, true)
 	require.NoError(t, err)
-	t.Log(med)
+	t.Log(prediction)
 }

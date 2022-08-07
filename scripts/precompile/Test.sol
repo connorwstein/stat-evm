@@ -19,7 +19,7 @@ interface MatrixMult{
     function matrixMultiply(int256[][] memory a, int256[][] memory b) external view returns (int256[][] memory);
 }
 interface PricePredict{
-    function getPredictPrice(uint256 v1) external view returns (uint256);
+    function getPredictPrice(uint256 v1, uint256 v2, uint256 v3) external view returns (uint256);
 }
 
 interface Fit {
@@ -75,8 +75,8 @@ contract Test {
         fitted = fit.fit(fitType, X, Y);
     }
 
-    function testPrediction(uint256 steps) public {
-        prediction = predict_prec.getPredictPrice(steps);
+    function testPrediction(uint256 steps, uint256 samples, uint256 targetTime) public {
+        prediction = predict_prec.getPredictPrice(steps, samples, targetTime);
     }
 
     function getFitted() public view returns (int256[][] memory) {

@@ -5,10 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a6e53b62-e077-4ce7-a4e0-ce5ff1a61989" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/precompile/predict_price.go" beforeDir="false" afterPath="$PROJECT_DIR$/precompile/predict_price.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/precompile/predict_price_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/precompile/predict_price_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/precompile/Test.sol" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/precompile/Test.sol" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/precompile/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/precompile/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/precompile/precompile" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/precompile/precompile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/precompile/wrap.go" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/precompile/wrap.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -28,23 +31,32 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.go.format.on.save.advertiser.fired": "true",
-    "RunOnceActivity.go.formatter.settings.were.checked": "true",
-    "RunOnceActivity.go.migrated.go.modules.settings": "true",
-    "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
-    "RunOnceActivity.go.watchers.conflict.with.on.save.actions.check.performed": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "go.import.settings.migrated": "true",
-    "go.sdk.automatically.set": "true",
-    "last_opened_file_path": "/Users/jimtao",
-    "nodejs_package_manager_path": "yarn"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.format.on.save.advertiser.fired&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.migrated.go.modules.settings&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.modules.go.list.on.any.changes.was.set&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.watchers.conflict.with.on.save.actions.check.performed&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
+    &quot;go.sdk.automatically.set&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/jimtao&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;yarn&quot;
   }
-}]]></component>
-  <component name="RunManager" selected="Go Test.TestPredictPrice in github.com/ava-labs/subnet-evm/precompile">
+}</component>
+  <component name="RunManager" selected="Go Test.predict_price_test.go">
+    <configuration name="go build predict_price.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="stat-evm" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="FILE" />
+      <package value="github.com/ava-labs/subnet-evm" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/precompile/predict_price.go" />
+      <method v="2" />
+    </configuration>
     <configuration name="TestPredictPrice in github.com/ava-labs/subnet-evm/precompile" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="stat-evm" />
       <working_directory value="$PROJECT_DIR$/precompile" />
@@ -70,8 +82,9 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Go Test.TestPredictPrice in github.com/ava-labs/subnet-evm/precompile" />
         <item itemvalue="Go Test.predict_price_test.go" />
+        <item itemvalue="Go Build.go build predict_price.go" />
+        <item itemvalue="Go Test.TestPredictPrice in github.com/ava-labs/subnet-evm/precompile" />
       </list>
     </recent_temporary>
   </component>

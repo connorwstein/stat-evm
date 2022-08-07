@@ -61,7 +61,7 @@ func start_events(ec *ethclient.Client, addr common.Address) {
 }
 
 func main() {
-	ec, err := ethclient.Dial("http://127.0.0.1:16031/ext/bc/2WBkUC71YJ47uW9TuR7ZyfHxyj9Z2zmY3ojA1UrjUsm2mRWymP/rpc")
+	ec, err := ethclient.Dial("http://127.0.0.1:13958/ext/bc/2QTUBvrCs3o8rrDTtEsc4SkdFTGFZWzDNTSzJKVM1hMaQJLpMw/rpc")
 	panicErr(err)
 
 	b, err := ec.ChainID(context.Background())
@@ -107,7 +107,7 @@ func main() {
 	panicErr(err)
 	fmt.Println("moment result", moment_res, err)
 
-	price_prediction_tx, err := testContract.TestPrediction(user, big.NewInt(2))
+	price_prediction_tx, err := testContract.TestPrediction(user, big.NewInt(10), big.NewInt(10), big.NewInt(10))
 	panicErr(err)
 	confirm(ec, price_prediction_tx.Hash())
 	// fmt.Println("Tx hash (moment_tx):", moment_tx.Hash())
