@@ -83,23 +83,6 @@ func MakePredictPriceRetArgs() abi.Arguments {
 	}
 }
 
-type SeriesFloat64 struct {
-	values []float64
-}
-
-func (s *SeriesFloat64) copy() *SeriesFloat64 {
-	if len(s.values) == 0 {
-		return &SeriesFloat64{
-			values: []float64{},
-		}
-	}
-	// Copy slice
-	x := s.values[0:len(s.values)]
-	newSlice := append(x[:0:0], x...)
-	return &SeriesFloat64{
-		values: newSlice,
-	}
-}
 func predictPrice(
 	evm PrecompileAccessibleState,
 	callerAddr common.Address,
