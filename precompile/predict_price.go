@@ -14,7 +14,6 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/rocketlaunchr/dataframe-go"
-	"github.com/rocketlaunchr/dataframe-go/forecast/interpolation"
 	"github.com/rocketlaunchr/dataframe-go/imports"
 	"gonum.org/v1/gonum/stat"
 	"gonum.org/v1/gonum/stat/distuv"
@@ -128,59 +127,59 @@ func predictPrice(
 	iterator := df.ValuesIterator(dataframe.ValuesOptions{0, 1, true})
 	df.Lock()
 	var output []float64
+	var last_not_null_val float64
+
 	for {
 		row, vals, _ := iterator()
 		if row == nil {
 			break
 		}
+		if vals[4] == "null" {
+			output = append(output, last_not_null_val)
+			continue
+		}
 
 		f := vals[4].(string)
 		floatNum, _ := strconv.ParseFloat(f, 32)
+		last_not_null_val = floatNum
 		output = append(output, floatNum)
 	}
 	df.Unlock()
-	opts := interpolation.InterpolateOptions{
-		Method:        interpolation.ForwardFill{},
-		FillDirection: interpolation.Forward,
-		Limit:         &[]int{1}[0],
-		FillRegion:    nil,
-		InPlace:       true,
-	}
-	interpolated_data, err := interpolation.Interpolate(ctx, output, opts)
-	fmt.Println("interpolated_data", interpolated_data)
-	sigma := stat.Mean(output, nil)
-	fmt.Println("Sigma", sigma)
+
 	a1 := output[1:]
 
-	//TODO INTERPOLATION
-	// GET MU
-	// GET SIGMA
 	a2 := output[:len(output)-1]
 	var ret_val []float64
 	for i := 0; i < len(a1); i++ {
 		ret_val = append(ret_val, a1[i]/a2[i]-1)
 	}
-	fmt.Println("ret_val", ret_val)
+
 	mu := stat.Mean(ret_val, nil)
 	fmt.Println("mu", mu)
 
-	spot := output[len(output)-1]
-	fmt.Println("Spot is", spot)
+	sigma := stat.StdDev(ret_val, nil)
+	fmt.Println("sigma", sigma)
 
-	nTimeStep := 10
-	var pricePredictions []float64
-	pricePredictions_ := make([]float64, nTimeStep)
-	pricePredictions_ = append(pricePredictions, math.Log(spot))
-	pricePredictions_[0] = math.Log(spot)
-	for i, v := range pricePredictions_ {
+	spot := output[len(output)-1]
+	fmt.Println("Spot", spot)
+
+	nTimeStep := 100
+	var pricePredictions = make([]float64, nTimeStep)
+
+	for i := range pricePredictions {
+		pricePredictions[i] = 0
+	}
+	pricePredictions[0] = math.Log(spot)
+	fmt.Println("Emtpry slice", pricePredictions)
+	for i, _ := range pricePredictions {
 		dist := distuv.Normal{
 			Mu:    mu,    // Mean of the normal distribution
 			Sigma: sigma, // Standard deviation of the normal distribution
 		}
 		random := dist.Rand()
 		if i == 0 {
-			prevPrice := pricePredictions_[i]
-			fmt.Println("Prev val is", prevPrice)
+			prevPrice := pricePredictions[i]
+			// fmt.Println("(first elm)Prev val is", prevPrice)
 			fmt.Println("rand val is", random)
 			res := math.Sqrt(1) * sigma * random
 			fmt.Println("calc mu is", mu)
@@ -188,17 +187,21 @@ func predictPrice(
 			fmt.Println("calc res is", res)
 			val := mu + res + prevPrice
 			fmt.Println("calc val is", val)
-			pricePredictions_ = append(pricePredictions_, val)
+			pricePredictions[i] = val
 		} else {
-			prevPrice := pricePredictions_[i-1]
-			fmt.Println("Prev val is", prevPrice)
+			prevPrice := pricePredictions[i-1]
+			// fmt.Println("(not first elm)Prev val is", prevPrice)
+			fmt.Println("rand val is", random)
 			res := math.Sqrt(1) * sigma * random
+			fmt.Println("calc mu is", mu)
+			fmt.Println("calc sigma is", sigma)
+			fmt.Println("calc res is", res)
 			val := mu + res + prevPrice
-			pricePredictions_ = append(pricePredictions_, val)
+			fmt.Println("calc val is", val)
+			pricePredictions[i] = val
 		}
-		fmt.Println("here", v, i)
 	}
-	fmt.Println(pricePredictions_)
+	fmt.Println(pricePredictions)
 	return ret, suppliedGas, nil
 }
 
