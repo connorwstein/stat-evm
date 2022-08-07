@@ -107,14 +107,20 @@ func main() {
 	panicErr(err)
 	fmt.Println("moment result", moment_res, err)
 
+	// TO-DO Un comment when price prediction precompile has IPFS enabled.
+	// Currently using CSV which will cause it to fail
+	// price_prediction_tx, err := testContract.TestPrediction(user, big.NewInt(2))
+	// panicErr(err)
+	// confirm(ec, price_prediction_tx.Hash())
+	// // fmt.Println("Tx hash (moment_tx):", moment_tx.Hash())
 	price_prediction_tx, err := testContract.TestPrediction(user, big.NewInt(10), big.NewInt(10), big.NewInt(10))
 	panicErr(err)
 	confirm(ec, price_prediction_tx.Hash())
 	// fmt.Println("Tx hash (moment_tx):", moment_tx.Hash())
 
-	price_prediction_res, err := testContract.Prediction(nil)
-	panicErr(err)
-	fmt.Println("price prediction result", price_prediction_res, err)
+	// price_prediction_res, err := testContract.Prediction(nil)
+	// panicErr(err)
+	// fmt.Println("price prediction result", price_prediction_res, err)
 
 	var a [][]*big.Int
 	for i := 0; i < 1; i++ {
