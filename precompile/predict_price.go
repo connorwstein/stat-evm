@@ -173,7 +173,7 @@ func predictPrice(
 
 	nTimeStep := v1.Int64()
 	nSamples := v2.Int64()
-	var outerPricePredictions = make([]float64, nSamples+1)
+	var samplePredictions = make([]float64, nSamples+1)
 	var pricePredictions = make([]float64, nTimeStep+1)
 	for x := range pricePredictions {
 		for i := range pricePredictions {
@@ -194,17 +194,17 @@ func predictPrice(
 				pricePredictions[i] = math.Exp(val)
 			}
 		}
-		outerPricePredictions[x] = stat.Mean(pricePredictions, nil)
-		fmt.Println("predicted price path is", pricePredictions)
+
+		samplePredictions[x] = stat.Mean(pricePredictions, nil)
 
 	}
-	prediction := stat.Mean(outerPricePredictions, nil)
+	prediction := stat.Mean(samplePredictions, nil)
 
 	ret, err = MakePredictPriceRetArgs().PackValues([]interface{}{prediction})
 	if err != nil {
 		return nil, suppliedGas, err
 	}
-	fmt.Println("outerPricePredictions", stat.Mean(outerPricePredictions, nil))
+	fmt.Println("price prediction", stat.Mean(samplePredictions, nil))
 	return ret, suppliedGas, nil
 }
 
