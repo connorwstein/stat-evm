@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/rocketlaunchr/dataframe-go"
 	"log"
 	"math"
 	"math/big"
@@ -13,7 +14,6 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/rocketlaunchr/dataframe-go"
 	"github.com/rocketlaunchr/dataframe-go/imports"
 	"gonum.org/v1/gonum/stat"
 	"gonum.org/v1/gonum/stat/distuv"
@@ -164,12 +164,11 @@ func predictPrice(
 	fmt.Println("spot", spot)
 
 	nTimeStep := v1.Int64()
-	var pricePredictions = make([]float64, nTimeStep)
+	var pricePredictions = make([]float64, nTimeStep+1)
 
 	for i := range pricePredictions {
 		pricePredictions[i] = 0
 	}
-	pricePredictions[0] = math.Log(spot)
 	for i, _ := range pricePredictions {
 		dist := distuv.Normal{
 			Mu:    mu,    // Mean of the normal distribution
@@ -177,18 +176,16 @@ func predictPrice(
 		}
 		random := dist.Rand()
 		if i == 0 {
-			res := math.Sqrt(1) * sigma * random
-			val := mu + res + math.Log(spot)
-			pricePredictions[i] = math.Exp(val)
+			pricePredictions[i] = spot
 		} else {
 			res := math.Sqrt(1) * sigma * random
-			val := mu + res + math.Log(spot)
+			val := mu + res + math.Log(pricePredictions[i-1])
+			fmt.Println("2 calc val is", val)
 			pricePredictions[i] = math.Exp(val)
 		}
 	}
 
-	mean := stat.Mean(pricePredictions, nil)
-	fmt.Println("mean is", mean)
+	fmt.Println("predicted price path is", pricePredictions)
 	return ret, suppliedGas, nil
 }
 

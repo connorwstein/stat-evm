@@ -61,7 +61,7 @@ func start_events(ec *ethclient.Client, addr common.Address) {
 }
 
 func main() {
-	ec, err := ethclient.Dial("http://127.0.0.1:11937/ext/bc/2ULc8rJdUkgN8uUCfGfviF9AjaRmze6D3aPiFBjTtjgBNbi9bN/rpc")
+	ec, err := ethclient.Dial("http://127.0.0.1:16031/ext/bc/2WBkUC71YJ47uW9TuR7ZyfHxyj9Z2zmY3ojA1UrjUsm2mRWymP/rpc")
 	panicErr(err)
 
 	b, err := ec.ChainID(context.Background())
