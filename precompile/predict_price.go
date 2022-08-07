@@ -161,9 +161,9 @@ func predictPrice(
 	fmt.Println("sigma", sigma)
 
 	spot := output[len(output)-1]
-	fmt.Println("Spot", spot)
+	fmt.Println("spot", spot)
 
-	nTimeStep := 5
+	nTimeStep := v1.Int64()
 	var pricePredictions = make([]float64, nTimeStep)
 
 	for i := range pricePredictions {
@@ -187,7 +187,8 @@ func predictPrice(
 		}
 	}
 
-	fmt.Println(pricePredictions)
+	mean := stat.Mean(pricePredictions, nil)
+	fmt.Println("mean is", mean)
 	return ret, suppliedGas, nil
 }
 
