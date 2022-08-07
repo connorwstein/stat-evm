@@ -146,6 +146,10 @@ if [[ ${E2E} != true ]]; then
       "blockTimestamp": 0
     },
     "contractIPFSPredictPrice": {
+    "contractIPFSMoment": {
+      "blockTimestamp": 0
+    },
+    "contractIPFSFit": {
       "blockTimestamp": 0
     }
   },

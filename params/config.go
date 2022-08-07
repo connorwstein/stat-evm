@@ -89,8 +89,9 @@ var (
 		},
 	}
 
-	TestChainConfig        = &ChainConfig{big.NewInt(1), DefaultFeeConfig, false, big.NewInt(0), big.NewInt(0), common.Hash{}, big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), NetworkUpgrades{big.NewInt(0)}, PrecompileUpgrade{}, UpgradeConfig{}, precompile.ContractXChainECRecoverConfig{}, precompile.ContractMedianConfig{}, precompile.ContractSamplerConfig{}, precompile.ContractMatrixMultConfig{}, precompile.ContractMomentConfig{}, precompile.ContractFitConfig{}, precompile.ContractPredictPriceConfig{}, precompile.ContractIPFSPredictPriceConfig{}}
-	TestPreSubnetEVMConfig = &ChainConfig{big.NewInt(1), DefaultFeeConfig, false, big.NewInt(0), big.NewInt(0), common.Hash{}, big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), NetworkUpgrades{}, PrecompileUpgrade{}, UpgradeConfig{}, precompile.ContractXChainECRecoverConfig{}, precompile.ContractMedianConfig{}, precompile.ContractSamplerConfig{}, precompile.ContractMatrixMultConfig{}, precompile.ContractMomentConfig{}, precompile.ContractFitConfig{}, precompile.ContractPredictPriceConfig{}, precompile.ContractIPFSPredictPriceConfig{}}
+	TestChainConfig        = &ChainConfig{big.NewInt(1), DefaultFeeConfig, false, big.NewInt(0), big.NewInt(0), common.Hash{}, big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), NetworkUpgrades{big.NewInt(0)}, PrecompileUpgrade{}, UpgradeConfig{}, precompile.ContractXChainECRecoverConfig{}, precompile.ContractMedianConfig{}, precompile.ContractSamplerConfig{}, precompile.ContractMatrixMultConfig{}, precompile.ContractMomentConfig{}, precompile.ContractFitConfig{}, precompile.ContractIPFSMomentConfig{}, precompile.ContractIPFSFitConfig{},precompile.ContractIPFSPredictPriceConfig{}}
+	TestPreSubnetEVMConfig = &ChainConfig{big.NewInt(1), DefaultFeeConfig, false, big.NewInt(0), big.NewInt(0), common.Hash{}, big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), NetworkUpgrades{}, PrecompileUpgrade{}, UpgradeConfig{}, precompile.ContractXChainECRecoverConfig{}, precompile.ContractMedianConfig{}, precompile.ContractSamplerConfig{}, precompile.ContractMatrixMultConfig{}, precompile.ContractMomentConfig{}, precompile.ContractFitConfig{}, precompile.ContractIPFSMomentConfig{}, precompile.ContractIPFSFitConfig{},precompile.ContractIPFSPredictPriceConfig{}}
+
 )
 
 // ChainConfig is the core config which determines the blockchain settings.
@@ -118,17 +119,19 @@ type ChainConfig struct {
 	IstanbulBlock       *big.Int `json:"istanbulBlock,omitempty"`       // Istanbul switch block (nil = no fork, 0 = already on istanbul)
 	MuirGlacierBlock    *big.Int `json:"muirGlacierBlock,omitempty"`    // Eip-2384 (bomb delay) switch block (nil = no fork, 0 = already activated)
 
-	NetworkUpgrades                                                          // Config for timestamps that enable avalanche network upgrades
-	PrecompileUpgrade                                                        // Config for enabling precompiles from genesis
-	UpgradeConfig                  `json:"-"`                                // Config specified in upgradeBytes (avalanche network upgrades or enable/disabling precompiles). Skip encoding/decoding directly into ChainConfig.
-	ContractXChainECRecoverConfig  precompile.ContractXChainECRecoverConfig  `json:"contractXChainECRecover,omitempty"`  // Config for the contract XChain ECrecover
-	ContractMedianConfig           precompile.ContractMedianConfig           `json:"contractMedian,omitempty"`           // Config for the median precompile contract
-	ContractSamplerConfig          precompile.ContractSamplerConfig          `json:"contractSampler,omitempty"`          // Config for the sampler precompile contract
-	ContractMatrixMultConfig       precompile.ContractMatrixMultConfig       `json:"contractMatrixMult,omitempty"`       // Config for the sampler precompile contract
-	ContractMomentConfig           precompile.ContractMomentConfig           `json:"contractMoment,omitempty"`           // Config for the moment precompile contract
-	ContractFitConfig              precompile.ContractFitConfig              `json:"contractFit,omitempty"`              // Config for the fit precompile contract
-	ContractPredictPriceConfig     precompile.ContractPredictPriceConfig     `json:"contractPredictPrice,omitempty"`     // Config for the fit precompile contract
-	ContractIPFSPredictPriceConfig precompile.ContractIPFSPredictPriceConfig `json:"contractIPFSPredictPrice,omitempty"` // Config for the fit precompile contract
+	NetworkUpgrades                                                        // Config for timestamps that enable avalanche network upgrades
+	PrecompileUpgrade                                                      // Config for enabling precompiles from genesis
+	UpgradeConfig                 `json:"-"`                               // Config specified in upgradeBytes (avalanche network upgrades or enable/disabling precompiles). Skip encoding/decoding directly into ChainConfig.
+	ContractXChainECRecoverConfig precompile.ContractXChainECRecoverConfig `json:"contractXChainECRecover,omitempty"` // Config for the contract XChain ECrecover
+	ContractMedianConfig          precompile.ContractMedianConfig          `json:"contractMedian,omitempty"`          // Config for the median precompile contract
+	ContractSamplerConfig         precompile.ContractSamplerConfig         `json:"contractSampler,omitempty"`         // Config for the sampler precompile contract
+	ContractMatrixMultConfig      precompile.ContractMatrixMultConfig      `json:"contractMatrixMult,omitempty"`      // Config for the sampler precompile contract
+	ContractMomentConfig          precompile.ContractMomentConfig          `json:"contractMoment,omitempty"`          // Config for the moment precompile contract
+	ContractFitConfig             precompile.ContractFitConfig             `json:"contractFit,omitempty"`             // Config for the fit precompile contract
+	ContractIPFSMomentConfig      precompile.ContractIPFSMomentConfig      `json:"contractIPFSMoment,omitempty"`      // Config for the moment precompile contract
+	ContractIPFSFitConfig         precompile.ContractIPFSFitConfig         `json:"contractIPFSFit,omitempty"`         // Config for the moment precompile contract
+  ContractIPFSPredictPriceConfig precompile.ContractIPFSPredictPriceConfig `json:"contractIPFSPredictPrice,omitempty"` // Config for the fit precompile contract
+
 }
 
 // UpgradeConfig includes the following configs that may be specified in upgradeBytes:
@@ -278,6 +281,14 @@ func (c *ChainConfig) IsMoment(blockTimestamp *big.Int) bool {
 
 func (c *ChainConfig) IsMatrixMult(blockTimestamp *big.Int) bool {
 	return utils.IsForked(c.ContractMatrixMultConfig.Timestamp(), blockTimestamp)
+}
+
+func (c *ChainConfig) IsIPFSMoment(blockTimestamp *big.Int) bool {
+	return utils.IsForked(c.ContractIPFSMomentConfig.Timestamp(), blockTimestamp)
+}
+
+func (c *ChainConfig) IsIPFSFit(blockTimestamp *big.Int) bool {
+	return utils.IsForked(c.ContractIPFSFitConfig.Timestamp(), blockTimestamp)
 }
 
 func (c *ChainConfig) IsFit(blockTimestamp *big.Int) bool {
@@ -525,14 +536,16 @@ type Rules struct {
 	IsTxAllowListEnabled               bool
 	IsFeeConfigManagerEnabled          bool
 
-	IsContractXChainECRecoverEnabled  bool
-	IsContractMedianEnabled           bool
-	IsContractSamplerEnabled          bool
-	IsContractMatrixMultEnabled       bool
-	IsContractMomentEnabled           bool
-	IsContractFitEnabled              bool
-	IsContractPredictPriceEnabled     bool
-	IsContractIPFSPredictPriceEnabled bool
+	IsContractXChainECRecoverEnabled bool
+	IsContractMedianEnabled          bool
+	IsContractSamplerEnabled         bool
+	IsContractMatrixMultEnabled      bool
+	IsContractIPFSMomenttEnabled     bool
+	IsContractMomentEnabled          bool
+	IsContractFitEnabled             bool
+	IsContractIPFSFitEnabled         bool
+  IsContractIPFSPredictPriceEnabled bool
+
 
 	// Precompiles maps addresses to stateful precompiled contracts that are enabled
 	// for this rule set.
@@ -575,9 +588,12 @@ func (c *ChainConfig) AvalancheRules(blockNum, blockTimestamp *big.Int) Rules {
 	rules.IsContractSamplerEnabled = c.IsSampler(blockTimestamp)
 	rules.IsContractMomentEnabled = c.IsSampler(blockTimestamp)
 	rules.IsContractMatrixMultEnabled = c.IsMatrixMult(blockTimestamp)
+	rules.IsContractIPFSMomenttEnabled = c.IsIPFSMoment(blockTimestamp)
 	rules.IsContractFitEnabled = c.IsFit(blockTimestamp)
-	rules.IsContractPredictPriceEnabled = c.IsFit(blockTimestamp)
-	rules.IsContractIPFSPredictPriceEnabled = c.IsFit(blockTimestamp)
+  rules.IsContractPredictPriceEnabled = c.IsFit(blockTimestamp)
+	rules.IsContractIPFSPredictPriceEnabled = c.IsFit(blockTimestam
+	rules.IsContractIPFSFitEnabled = c.IsIPFSFit(blockTimestamp)
+
 
 	// Initialize the stateful precompiles that should be enabled at [blockTimestamp].
 	rules.Precompiles = make(map[common.Address]precompile.StatefulPrecompiledContract)

@@ -31,10 +31,16 @@ import (
 	"fmt"
 	"math"
 	"math/big"
+	"net/http"
 	"sort"
 	"sync"
 	"sync/atomic"
 	"time"
+
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/prque"
+	"github.com/ethereum/go-ethereum/event"
+	"github.com/ethereum/go-ethereum/log"
 
 	"github.com/ava-labs/subnet-evm/commontype"
 	"github.com/ava-labs/subnet-evm/consensus/dummy"
@@ -43,10 +49,6 @@ import (
 	"github.com/ava-labs/subnet-evm/metrics"
 	"github.com/ava-labs/subnet-evm/params"
 	"github.com/ava-labs/subnet-evm/precompile"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/prque"
-	"github.com/ethereum/go-ethereum/event"
-	"github.com/ethereum/go-ethereum/log"
 )
 
 const (
@@ -703,6 +705,24 @@ func (pool *TxPool) validateTx(tx *types.Transaction, local bool) error {
 	// Reject dynamic fee transactions until EIP-1559 activates.
 	if !pool.eip1559 && tx.Type() == types.DynamicFeeTxType {
 		return ErrTxTypeNotSupported
+	}
+	// TODO: Introduce a "Data" or "IPFS" tx.type
+	if len(tx.Data()) > 0 {
+		args, err := precompile.MakeIPFSFitArgs().Unpack(tx.Data()[4:])
+		if err == nil && len(args) == 2 {
+			log.Info(fmt.Sprintf("ipfs fit tx %v", args))
+			ipfsHash, ok := args[0].(string)
+			if ok && ipfsHash != string(0x00) {
+				resp, err := http.Get(fmt.Sprintf("http://127.0.0.1:8080/ipfs/%s", ipfsHash))
+				if err != nil || resp.StatusCode != 200 {
+					log.Info("unable to load ipfs data")
+					return errors.New(fmt.Sprintf("unable to load IPFS data %v, err %v", ipfsHash, err))
+				}
+				log.Info("ipfs fit data available")
+				// If success data is available and loaded into local cache (replicated)
+			}
+		}
+		log.Info(fmt.Sprintf("validating tx %v %v", err, args))
 	}
 	// Reject transactions over defined size to prevent DOS attacks
 	if txSize := uint64(tx.Size()); txSize > txMaxSize {
