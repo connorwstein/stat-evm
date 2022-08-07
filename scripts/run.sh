@@ -141,10 +141,10 @@ if [[ ${E2E} != true ]]; then
     },
     "contractMoment": {
       "blockTimestamp": 0
-    }
+    },
     "contractIPFSMoment": {
       "blockTimestamp": 0
-    }
+    },
     "contractIPFSFit": {
       "blockTimestamp": 0
     }
