@@ -144,6 +144,9 @@ if [[ ${E2E} != true ]]; then
     },
     "contractPredictPrice": {
       "blockTimestamp": 0
+    },
+    "contractIPFSPredictPrice": {
+      "blockTimestamp": 0
     }
   },
   "alloc": {

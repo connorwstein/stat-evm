@@ -61,7 +61,7 @@ func start_events(ec *ethclient.Client, addr common.Address) {
 }
 
 func main() {
-	ec, err := ethclient.Dial("http://127.0.0.1:13958/ext/bc/2QTUBvrCs3o8rrDTtEsc4SkdFTGFZWzDNTSzJKVM1hMaQJLpMw/rpc")
+	ec, err := ethclient.Dial("http://127.0.0.1:46852/ext/bc/2WR1r4qc469LJHhtSQ3sLJxCmLHtnhpKDCDjbDgrb3sarf5K7H/rpc")
 	panicErr(err)
 
 	b, err := ec.ChainID(context.Background())
@@ -107,20 +107,14 @@ func main() {
 	panicErr(err)
 	fmt.Println("moment result", moment_res, err)
 
-	// TO-DO Un comment when price prediction precompile has IPFS enabled.
-	// Currently using CSV which will cause it to fail
-	// price_prediction_tx, err := testContract.TestPrediction(user, big.NewInt(2))
-	// panicErr(err)
-	// confirm(ec, price_prediction_tx.Hash())
-	// // fmt.Println("Tx hash (moment_tx):", moment_tx.Hash())
-	price_prediction_tx, err := testContract.TestPrediction(user, big.NewInt(10), big.NewInt(10), big.NewInt(10))
+	price_prediction_tx, err := testContract.TestIPFSPrediction(user, "QmZbV8nB1uQf5NqhsXB8RhGNJpUr4v92Br4jw6a7MdExvz", big.NewInt(10), big.NewInt(10))
 	panicErr(err)
 	confirm(ec, price_prediction_tx.Hash())
-	// fmt.Println("Tx hash (moment_tx):", moment_tx.Hash())
+	fmt.Println("Tx hash (price_prediction_tx):", price_prediction_tx.Hash())
 
-	// price_prediction_res, err := testContract.Prediction(nil)
-	// panicErr(err)
-	// fmt.Println("price prediction result", price_prediction_res, err)
+	price_prediction_res, err := testContract.IpfsPrediction(nil)
+	panicErr(err)
+	fmt.Println("price prediction result", price_prediction_res, err)
 
 	var a [][]*big.Int
 	for i := 0; i < 1; i++ {
