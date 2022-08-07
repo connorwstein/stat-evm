@@ -18,6 +18,12 @@ interface Moment {
 interface MatrixMult{
     function matrixMultiply(int256[][] memory a, int256[][] memory b) external view returns (int256[][] memory);
 }
+interface PricePredict{
+    function getPredictPrice(uint256 v1, uint256 v2, uint256 v3) external view returns (uint256);
+}
+
+interface IPFSPricePredict {
+    function getIPFSPredictPrice(string memory ipfsHash, uint256 v2, uint256 v3) external returns (uint256);
 interface IPFSMoment{
     function getMoment(string memory ipfsHash, uint256 moment) external view returns (uint256);
 }
@@ -39,6 +45,8 @@ contract Test {
     int256[] public sample;
     int256[][] public product;
     int256[][] public fitted;
+    uint256 public prediction;
+    uint256 public ipfsPrediction;
     int256[][] public ipfsCoeffs;
     int256[] public ipfsIntercepts;
     uint256 public ipfsMomentRes;
@@ -53,6 +61,8 @@ contract Test {
     IPFSMoment ipfsMoment = IPFSMoment(0x0300000000000000000000000000000000000008);
     IPFSFit ipfsFit =          IPFSFit(0x0300000000000000000000000000000000000009);
     Fit fit = Fit(0x0300000000000000000000000000000000000007);
+    PricePredict predict_prec = PricePredict(0x0300000000000000000000000000000000000008);
+    IPFSPricePredict ipfs_predict_prec = IPFSPricePredict(0x0300000000000000000000000000000000000010);
 
     function testMedian(uint256[] memory vals) public {
         med = prec.getMedian(vals);
@@ -98,6 +108,14 @@ contract Test {
         fitted = fit.fit(fitType, X, Y);
     }
 
+    function testPrediction(uint256 steps, uint256 samples, uint256 targetTime) public {
+        prediction = predict_prec.getPredictPrice(steps, samples, targetTime);
+    }
+
+    function testIPFSPrediction(string memory ipfsHash, uint256 samples, uint256 targetTime) public {
+        ipfsPrediction = ipfs_predict_prec.getIPFSPredictPrice(ipfsHash, targetTime, samples);
+
+}
     // Predict a single Y
     function testPrediction(int256[][] memory dependentVars) public  {
        int256[][] memory predictedNoIntercept = matrixMult.matrixMultiply(dependentVars, getIPFSCoeffs());
@@ -108,5 +126,9 @@ contract Test {
 
     function getFitted() public view returns (int256[][] memory) {
         return fitted;
+    }
+
+    function getPrediction() public view returns (uint256) {
+        return ipfsPrediction;
     }
 }

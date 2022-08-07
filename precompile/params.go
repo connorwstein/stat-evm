@@ -15,10 +15,12 @@ const (
 	readGasCostPerSlot  = 5_000
 	XChainECRecoverCost = 10_000
 	// TODO: What are these and are they required?
-	MedianCost    = 10_000
-	SamplerCost   = 10_000
-	MatrixMulCost = 10_000
-	FitCost       = 10_000
+	MedianCost           = 10_000
+	SamplerCost          = 10_000
+	MatrixMulCost        = 10_000
+	FitCost              = 10_000
+	PredictPriceCost     = 10_000
+	IPFSPredictPriceCost = 10_000
 
 	ModifyAllowListGasCost = writeGasCostPerSlot
 	ReadAllowListGasCost   = readGasCostPerSlot
@@ -53,6 +55,8 @@ var (
 	ContractMomentAddress            = common.HexToAddress("0x0300000000000000000000000000000000000006")
 	ContractIPFSMomentAddress        = common.HexToAddress("0x0300000000000000000000000000000000000008")
 	ContractFitAddress               = common.HexToAddress("0x0300000000000000000000000000000000000007")
+	ContractPredictPriceAddress      = common.HexToAddress("0x0300000000000000000000000000000000000008")
+	ContractIPFSPredictPriceAddress  = common.HexToAddress("0x0300000000000000000000000000000000000010")
 	ContractIPFSFitAddress           = common.HexToAddress("0x0300000000000000000000000000000000000009")
 
 	UsedAddresses = []common.Address{
@@ -66,6 +70,8 @@ var (
 		ContractMatrixMultAddress,
 		ContractMomentAddress,
 		ContractFitAddress,
+		ContractPredictPriceAddress,
+		ContractIPFSPredictPriceAddress,
 		ContractIPFSMomentAddress,
 		ContractIPFSFitAddress,
 	}

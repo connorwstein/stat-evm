@@ -79,7 +79,8 @@ func start_events(ec *ethclient.Client, addr common.Address) {
 }
 
 func main() {
-	ec, err := ethclient.Dial("http://127.0.0.1:11918/ext/bc/2YTfhNo7gDm3pdnfdtboQMcKQ6UDrWBX1MTdcuBF5Ch1Wqqrj5/rpc")
+	ec, err := ethclient.Dial("http://127.0.0.1:11739/ext/bc/pzcofHDVjZWS6HgZEj7cvXtRvsSzuqhupBMcdrzB2QTuG7kWz/rpc")
+
 	panicErr(err)
 
 	b, err := ec.ChainID(context.Background())
@@ -188,6 +189,36 @@ func main() {
 	panicErr(err)
 	fmt.Println(intercepts)
 
+	sampler_res, err := testContract.GetLastSample(nil)
+	panicErr(err)
+	fmt.Println("sample result", sampler_res, err)
+
+	moment_tx, err := testContract.TestMoment(user, big.NewInt(2), []*big.Int{big.NewInt(23), big.NewInt(31), big.NewInt(23)}, []*big.Int{big.NewInt(1), big.NewInt(1), big.NewInt(1)})
+	panicErr(err)
+	confirm(ec, moment_tx.Hash())
+	// fmt.Println("Tx hash (moment_tx):", moment_tx.Hash())
+
+	moment_res, err := testContract.Moment(nil)
+	panicErr(err)
+	fmt.Println("moment result", moment_res, err)
+
+	price_prediction_tx, err := testContract.TestIPFSPrediction(user, "QmZbV8nB1uQf5NqhsXB8RhGNJpUr4v92Br4jw6a7MdExvz", big.NewInt(10), big.NewInt(10))
+	panicErr(err)
+	fmt.Println("Tx hash (price_prediction_tx):", price_prediction_tx.Hash())
+
+	confirm(ec, price_prediction_tx.Hash())
+
+	price_prediction_res, err := testContract.GetPrediction(nil)
+	panicErr(err)
+	fmt.Println("price prediction result", price_prediction_res, err)
+
+	var a [][]*big.Int
+	for i := 0; i < 1; i++ {
+		a = append(a, []*big.Int{big.NewInt(1), big.NewInt(2), big.NewInt(3)})
+	}
+	var b2 [][]*big.Int
+	for i := 0; i < 3; i++ {
+		b2 = append(b2, []*big.Int{big.NewInt(int64(i + 1))})
 	// longitude,latitude,housing_median_age,total_rooms,total_bedrooms,population,households,median_income,median_house_value
 	// -122, 38, 21, 7099, 1106, 2401, 1138, 8
 	var idv = [][]*big.Int{
