@@ -22,7 +22,7 @@ interface IPFSMoment{
     function getMoment(string memory ipfsHash, uint256 moment) external view returns (uint256);
 }
 interface IPFSFit{
-    function fit(string memory ipfsHash, uint256 fitType) external view returns (int256[][] calldata);
+    function fit(string memory ipfsHash, uint256 fitType) external view returns (int256[][] calldata, int256[] calldata);
 }
 interface Fit {
     function fit(

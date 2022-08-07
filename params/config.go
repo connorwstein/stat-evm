@@ -128,6 +128,7 @@ type ChainConfig struct {
 	ContractMomentConfig          precompile.ContractMomentConfig          `json:"contractMoment,omitempty"`          // Config for the moment precompile contract
 	ContractFitConfig             precompile.ContractFitConfig             `json:"contractFit,omitempty"`             // Config for the fit precompile contract
 	ContractIPFSMomentConfig      precompile.ContractIPFSMomentConfig      `json:"contractIPFSMoment,omitempty"`      // Config for the moment precompile contract
+	ContractIPFSFitConfig         precompile.ContractIPFSFitConfig         `json:"contractIPFSFit,omitempty"`         // Config for the moment precompile contract
 }
 
 // UpgradeConfig includes the following configs that may be specified in upgradeBytes:
@@ -281,6 +282,10 @@ func (c *ChainConfig) IsMatrixMult(blockTimestamp *big.Int) bool {
 
 func (c *ChainConfig) IsIPFSMoment(blockTimestamp *big.Int) bool {
 	return utils.IsForked(c.ContractIPFSMomentConfig.Timestamp(), blockTimestamp)
+}
+
+func (c *ChainConfig) IsIPFSFit(blockTimestamp *big.Int) bool {
+	return utils.IsForked(c.ContractIPFSFitConfig.Timestamp(), blockTimestamp)
 }
 
 func (c *ChainConfig) IsFit(blockTimestamp *big.Int) bool {
@@ -527,6 +532,7 @@ type Rules struct {
 	IsContractIPFSMomenttEnabled     bool
 	IsContractMomentEnabled          bool
 	IsContractFitEnabled             bool
+	IsContractIPFSFitEnabled         bool
 
 	// Precompiles maps addresses to stateful precompiled contracts that are enabled
 	// for this rule set.
@@ -571,6 +577,7 @@ func (c *ChainConfig) AvalancheRules(blockNum, blockTimestamp *big.Int) Rules {
 	rules.IsContractMatrixMultEnabled = c.IsMatrixMult(blockTimestamp)
 	rules.IsContractIPFSMomenttEnabled = c.IsIPFSMoment(blockTimestamp)
 	rules.IsContractFitEnabled = c.IsFit(blockTimestamp)
+	rules.IsContractIPFSFitEnabled = c.IsIPFSFit(blockTimestamp)
 
 	// Initialize the stateful precompiles that should be enabled at [blockTimestamp].
 	rules.Precompiles = make(map[common.Address]precompile.StatefulPrecompiledContract)

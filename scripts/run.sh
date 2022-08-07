@@ -142,6 +142,12 @@ if [[ ${E2E} != true ]]; then
     "contractMoment": {
       "blockTimestamp": 0
     }
+    "contractIPFSMoment": {
+      "blockTimestamp": 0
+    }
+    "contractIPFSFit": {
+      "blockTimestamp": 0
+    }
   },
   "alloc": {
     "${GENESIS_ADDRESS:2}": {
