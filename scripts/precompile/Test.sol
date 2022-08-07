@@ -23,7 +23,7 @@ interface PricePredict{
 }
 
 interface IPFSPricePredict {
-    function getIPFSPredictPrice(string memory ipfsHash, uint256 v2, uint256 v3) external view returns (uint256);
+    function getIPFSPredictPrice(string memory ipfsHash, uint256 v2, uint256 v3) external returns (uint256);
 }
 
 interface Fit {
@@ -91,5 +91,9 @@ contract Test {
 
     function getFitted() public view returns (int256[][] memory) {
         return fitted;
+    }
+
+    function getPrediction() public view returns (uint256) {
+        return ipfsPrediction;
     }
 }

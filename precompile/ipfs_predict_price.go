@@ -1,9 +1,12 @@
 package precompile
 
 import (
+	"crypto/md5"
+	"encoding/binary"
 	"encoding/csv"
 	"errors"
 	"fmt"
+	"io"
 	"math"
 	"math/big"
 	"net/http"
@@ -12,6 +15,7 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
+	"golang.org/x/exp/rand"
 	"gonum.org/v1/gonum/stat"
 	"gonum.org/v1/gonum/stat/distuv"
 )
@@ -56,16 +60,16 @@ func mustIPFSPredictPriceType(ts string) abi.Type {
 func MakeIPFSPredictPriceArgs() abi.Arguments {
 	return abi.Arguments{
 		{
-			Name: "ipfsHash",
-			Type: mustType("string"),
+			Name: "v1",
+			Type: mustIPFSPredictPriceType("string"),
 		},
 		{
-			Name: "numOfSamples",
-			Type: mustType("uint256"),
+			Name: "v2",
+			Type: mustIPFSPredictPriceType("uint256"),
 		},
 		{
-			Name: "targetTimeToPredict",
-			Type: mustType("uint256"),
+			Name: "v3",
+			Type: mustIPFSPredictPriceType("uint256"),
 		},
 	}
 }
@@ -73,7 +77,7 @@ func MakeIPFSPredictPriceArgs() abi.Arguments {
 func MakeIPFSPredictPriceRetArgs() abi.Arguments {
 	return abi.Arguments{
 		{
-			Name: "predictedPrice",
+			Name: "ret",
 			Type: mustIPFSPredictPriceType("uint256"),
 		},
 	}
@@ -97,7 +101,7 @@ func predictPriceIPFS(
 		return nil, suppliedGas, errors.New("Invalid number of args")
 	}
 	ipfsHash, ok := vals[0].(string)
-
+	fmt.Println(ipfsHash)
 	if !ok {
 		return nil, suppliedGas, errors.New("invalid val")
 	}
@@ -109,7 +113,6 @@ func predictPriceIPFS(
 	if !ok {
 		return nil, suppliedGas, errors.New("invalid val")
 	}
-
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -136,6 +139,12 @@ func predictPriceIPFS(
 		floatNum, _ := strconv.ParseFloat(i[1], 32)
 		price_history = append(price_history, floatNum)
 	}
+	// price_history = append(price_history, 33)
+	// price_history = append(price_history, 35)
+	// price_history = append(price_history, 32)
+	// price_history = append(price_history, 35)
+	// price_history = append(price_history, 32)
+	// price_history = append(price_history, 32)
 
 	a1 := price_history[1:]
 
@@ -151,22 +160,28 @@ func predictPriceIPFS(
 
 	spot := price_history[len(price_history)-1]
 
+	// Get random seed from hash of caller address, receiver address, and block timestamp
+	h := md5.New()
+	io.WriteString(h, callerAddr.String()+addr.String())
+	randomSeed := rand.NewSource(binary.BigEndian.Uint64(h.Sum(nil)))
+
 	dist := distuv.Normal{
 		Mu:    mu,    // Mean of the normal distribution
 		Sigma: sigma, // Standard deviation of the normal distribution
+		Src:   randomSeed,
 	}
-	random := dist.Rand()
 
 	nTimeStep := v1.Int64()
 	nSamples := v2.Int64()
 	targetTime := nTimeStep
-	var samplePredictions = make([]float64, nSamples+1)
+	var samples = make([]float64, nSamples+1)
 	var pricePredictions = make([]float64, nTimeStep+1)
-	for x := range pricePredictions {
+	for x := range samples {
 		for i := range pricePredictions {
 			pricePredictions[i] = 0
 		}
 		for i, _ := range pricePredictions {
+			random := dist.Rand()
 			if i == 0 {
 				pricePredictions[i] = spot
 			} else {
@@ -175,17 +190,19 @@ func predictPriceIPFS(
 				pricePredictions[i] = math.Exp(val)
 			}
 		}
-		samplePredictions[x] = pricePredictions[targetTime]
+		samples[x] = pricePredictions[targetTime]
+		fmt.Println("samples", samples)
 	}
-	prediction := stat.Mean(samplePredictions, nil)
-	intPrediction := int64(prediction)
-	f := new(big.Int).SetInt64(intPrediction)
 
-	ret, err = MakeIPFSPredictPriceRetArgs().PackValues([]interface{}{f})
+	prediction := stat.Mean(samples, nil)
+	bigval := new(big.Float).SetFloat64(prediction)
+	intPrediction, _ := bigval.Int64()
+	result := new(big.Int).SetInt64(intPrediction)
+	fmt.Println("predict", prediction)
+	ret, err = MakeIPFSPredictPriceRetArgs().PackValues([]interface{}{result})
 	if err != nil {
 		return nil, suppliedGas, err
 	}
-	fmt.Println("price prediction", stat.Mean(samplePredictions, nil))
 	return ret, suppliedGas, nil
 }
 

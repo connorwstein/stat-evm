@@ -61,7 +61,7 @@ func start_events(ec *ethclient.Client, addr common.Address) {
 }
 
 func main() {
-	ec, err := ethclient.Dial("http://127.0.0.1:46852/ext/bc/2WR1r4qc469LJHhtSQ3sLJxCmLHtnhpKDCDjbDgrb3sarf5K7H/rpc")
+	ec, err := ethclient.Dial("http://127.0.0.1:11739/ext/bc/pzcofHDVjZWS6HgZEj7cvXtRvsSzuqhupBMcdrzB2QTuG7kWz/rpc")
 	panicErr(err)
 
 	b, err := ec.ChainID(context.Background())
@@ -109,10 +109,11 @@ func main() {
 
 	price_prediction_tx, err := testContract.TestIPFSPrediction(user, "QmZbV8nB1uQf5NqhsXB8RhGNJpUr4v92Br4jw6a7MdExvz", big.NewInt(10), big.NewInt(10))
 	panicErr(err)
-	confirm(ec, price_prediction_tx.Hash())
 	fmt.Println("Tx hash (price_prediction_tx):", price_prediction_tx.Hash())
 
-	price_prediction_res, err := testContract.IpfsPrediction(nil)
+	confirm(ec, price_prediction_tx.Hash())
+
+	price_prediction_res, err := testContract.GetPrediction(nil)
 	panicErr(err)
 	fmt.Println("price prediction result", price_prediction_res, err)
 

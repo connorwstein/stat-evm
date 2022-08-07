@@ -119,7 +119,6 @@ func calcMoment(
 	weights := bigIntToFloat64(v3)
 
 	_result := stat.Moment(moment, samples, weights)
-
 	bigval := new(big.Float).SetFloat64(_result)
 	rr, _ := bigval.Int64()
 	result := new(big.Int).SetInt64(rr)
