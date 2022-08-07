@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"math/big"
 	"net/http"
+	"strconv"
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
+	linearmodel "github.com/pa-m/sklearn/linear_model"
 )
 
 type ContractIPFSFitConfig struct {
@@ -60,8 +62,12 @@ func MakeIPFSFitArgs() abi.Arguments {
 func MakeIPFSFitRetArgs() abi.Arguments {
 	return abi.Arguments{
 		{
-			Name: "ret",
-			Type: mustType("uint256"),
+			Name: "coeff",
+			Type: mustType("int256[][]"),
+		},
+		{
+			Name: "intercept",
+			Type: mustType("int256[]"),
 		},
 	}
 }
@@ -90,9 +96,67 @@ func getIPFSFit(
 		return nil, remainingGas, err
 	}
 	r := csv.NewReader(data.Body)
-	//rows, err := r.ReadAll()
-	fmt.Println(r)
-	ret, err = MakeRetArgs().PackValues([]interface{}{big.NewInt(int64(10))})
+	rows, err := r.ReadAll()
+	if err != nil {
+		return nil, remainingGas, err
+	}
+	if err := data.Body.Close(); err != nil {
+		return nil, remainingGas, err
+	}
+	var X [][]float64                      // row major independent
+	var Y [][]float64                      // row major dependent
+	for row := 1; row < len(rows); row++ { // Assume always first row is headings?
+		var rowVals []float64
+		skipRow := false
+		for col := 0; col < (len(rows[row]) - 1); col++ { // all but last column
+			if rows[row][col] == "" {
+				// Throw away row if empty value
+				skipRow = true
+				break
+			}
+			f, err := strconv.ParseFloat(rows[row][col], 64)
+			if err != nil {
+				return nil, remainingGas, err
+			}
+			rowVals = append(rowVals, f)
+		}
+		if skipRow {
+			continue
+		}
+		X = append(X, rowVals)
+
+		// Parse dependent val (last column)
+		f, err := strconv.ParseFloat(rows[row][len(rows[row])-1], 64)
+		if err != nil {
+			return nil, remainingGas, err
+		}
+		Y = append(Y, []float64{f})
+	}
+	matX := buildMatrixFromFloat(X)
+	matY := buildMatrixFromFloat(Y)
+	r1, c1 := matX.Dims()
+	r2, c2 := matY.Dims()
+	fmt.Println("dims", r1, c1, r2, c2)
+	// Compress into matrix
+	regr := linearmodel.NewLinearRegression()
+	regr.Fit(matX, matY)
+	fmt.Println("receipt")
+	coeff := *regr.Coef
+	fmt.Printf("intercept %f\n", regr.Intercept.RawRowView(0)[0])
+	nr, _ := coeff.Dims()
+	var res [][]*big.Int
+	for row := 0; row < nr; row++ {
+		rowVals := coeff.RawRowView(row)
+		solRow := make([]*big.Int, len(rowVals))
+		for i, rowVal := range rowVals {
+			rowEntry, _ := big.NewFloat(rowVal).Int64() // Scale up instead of truncate?
+			solRow[i] = big.NewInt(rowEntry)
+		}
+		res = append(res, solRow)
+	}
+	// TODO: maybe generalize to
+	rowEntry, _ := big.NewFloat(regr.Intercept.RawRowView(0)[0]).Int64() // Scale up instead of truncate?
+	ret, err = MakeIPFSFitRetArgs().PackValues([]interface{}{res, []*big.Int{big.NewInt(rowEntry)}})
 	if err != nil {
 		return nil, suppliedGas, err
 	}
