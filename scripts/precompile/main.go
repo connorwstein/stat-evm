@@ -61,7 +61,7 @@ func start_events(ec *ethclient.Client, addr common.Address) {
 }
 
 func main() {
-	ec, err := ethclient.Dial("http://127.0.0.1:24821/ext/bc/CsGA2hKqQ7M94k6e9vmQ9JYhYYLGxQNRrDQV9GJpPXhCHFuAg/rpc")
+	ec, err := ethclient.Dial("http://127.0.0.1:24398/ext/bc/2a5357vYn934dFCZyLCXx7Xm2ZEHsra84uXreDQzXkbAhgfqfz/rpc")
 	panicErr(err)
 
 	b, err := ec.ChainID(context.Background())
@@ -162,4 +162,13 @@ func main() {
 	panicErr(err)
 	fmt.Println(intercepts)
 
+	// -122, 38, 21, 7099, 1106, 2401, 1138, 8
+	var idv = [][]*big.Int{
+		{big.NewInt(-122), big.NewInt(38), big.NewInt(21), big.NewInt(7099), big.NewInt(1106), big.NewInt(2401), big.NewInt(1138), big.NewInt(8)},
+	}
+	pred_tx, err := testContract.TestPrediction(user, idv)
+	panicErr(err)
+	confirm(ec, pred_tx.Hash())
+	pred, err := testContract.Predicted(nil)
+	fmt.Println(pred.Int64())
 }

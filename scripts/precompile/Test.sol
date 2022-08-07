@@ -42,6 +42,7 @@ contract Test {
     int256[][] public ipfsCoeffs;
     int256[] public ipfsIntercepts;
     uint256 public ipfsMomentRes;
+    int256 public predicted;
 
     event Debug(string message, int256 res);
 
@@ -95,6 +96,14 @@ contract Test {
 
     function testFit(uint256 fitType, int256[][] memory X, int256[][] memory Y) public {
         fitted = fit.fit(fitType, X, Y);
+    }
+
+    // Predict a single Y
+    function testPrediction(int256[][] memory dependentVars) public  {
+       int256[][] memory predictedNoIntercept = matrixMult.matrixMultiply(dependentVars, getIPFSCoeffs());
+       // Hack we expect only one val
+       int256[] memory intercepts =  getIPFSIntercepts();
+       predicted = predictedNoIntercept[0][0]/1e6+intercepts[0]/1e6;
     }
 
     function getFitted() public view returns (int256[][] memory) {
