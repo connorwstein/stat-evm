@@ -4,12 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/rocketlaunchr/dataframe-go"
 	"log"
 	"math"
 	"math/big"
 	"os"
 	"strconv"
+
+	"github.com/rocketlaunchr/dataframe-go"
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
@@ -59,8 +60,12 @@ func mustPredictPriceType(ts string) abi.Type {
 func MakePredictPriceArgs() abi.Arguments {
 	return abi.Arguments{
 		{
-			Name: "v1",
-			Type: mustPredictPriceType("uint256"),
+			Name: "numOfSamples",
+			Type: mustType("uint256"),
+		},
+		{
+			Name: "stepToPredict",
+			Type: mustType("uint256"),
 		},
 	}
 }
@@ -68,8 +73,8 @@ func MakePredictPriceArgs() abi.Arguments {
 func MakePredictPriceRetArgs() abi.Arguments {
 	return abi.Arguments{
 		{
-			Name: "ret",
-			Type: mustType("uint256"),
+			Name: "predictedPrice",
+			Type: mustPredictPriceType("uint256"),
 		},
 	}
 }
@@ -105,7 +110,7 @@ func predictPrice(
 	if err != nil {
 		return nil, suppliedGas, err
 	}
-	if len(vals) != 1 {
+	if len(vals) != 2 {
 		return nil, suppliedGas, errors.New("Invalid number of args")
 	}
 
@@ -113,7 +118,10 @@ func predictPrice(
 	if !ok {
 		return nil, suppliedGas, errors.New("invalid val")
 	}
-	fmt.Println(v1)
+	v2, ok := vals[0].(*big.Int)
+	if !ok {
+		return nil, suppliedGas, errors.New("invalid val")
+	}
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -164,28 +172,34 @@ func predictPrice(
 	fmt.Println("spot", spot)
 
 	nTimeStep := v1.Int64()
+	nSamples := v2.Int64()
+	var outerPricePredictions = make([]float64, nSamples+1)
 	var pricePredictions = make([]float64, nTimeStep+1)
-
-	for i := range pricePredictions {
-		pricePredictions[i] = 0
-	}
-	for i, _ := range pricePredictions {
-		dist := distuv.Normal{
-			Mu:    mu,    // Mean of the normal distribution
-			Sigma: sigma, // Standard deviation of the normal distribution
+	for x := range pricePredictions {
+		for i := range pricePredictions {
+			pricePredictions[i] = 0
 		}
-		random := dist.Rand()
-		if i == 0 {
-			pricePredictions[i] = spot
-		} else {
-			res := math.Sqrt(1) * sigma * random
-			val := mu + res + math.Log(pricePredictions[i-1])
-			fmt.Println("2 calc val is", val)
-			pricePredictions[i] = math.Exp(val)
+		for i, _ := range pricePredictions {
+			dist := distuv.Normal{
+				Mu:    mu,    // Mean of the normal distribution
+				Sigma: sigma, // Standard deviation of the normal distribution
+			}
+			random := dist.Rand()
+			if i == 0 {
+				pricePredictions[i] = spot
+			} else {
+				res := math.Sqrt(1) * sigma * random
+				val := mu + res + math.Log(pricePredictions[i-1])
+				fmt.Println("2 calc val is", val)
+				pricePredictions[i] = math.Exp(val)
+			}
 		}
-	}
+		outerPricePredictions[x] = stat.Mean(pricePredictions, nil)
+		fmt.Println("predicted price path is", pricePredictions)
 
-	fmt.Println("predicted price path is", pricePredictions)
+	}
+	fmt.Println("outerPricePredictions", stat.Mean(outerPricePredictions, nil))
+
 	return ret, suppliedGas, nil
 }
 

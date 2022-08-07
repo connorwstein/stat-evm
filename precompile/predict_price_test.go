@@ -10,7 +10,7 @@ import (
 )
 
 func TestPredictPrice(t *testing.T) {
-	input, err := MakePredictPriceArgs().Pack(big.NewInt(10))
+	input, err := MakePredictPriceArgs().Pack(big.NewInt(10), big.NewInt(10))
 	require.NoError(t, err)
 	med, s, s2 := predictPrice(nil, common.Address{}, common.Address{}, input, 100_000, true)
 	fmt.Println("s:", s)
