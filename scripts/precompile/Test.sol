@@ -18,6 +18,10 @@ interface Moment {
 interface MatrixMult{
     function matrixMultiply(int256[][] memory a, int256[][] memory b) external view returns (int256[][] memory);
 }
+interface PricePredict{
+    function getPredictPrice(uint256 v1) external view returns (uint256);
+}
+
 interface Fit {
     function fit(
         uint256 fitType,
@@ -32,6 +36,7 @@ contract Test {
     int256[] public sample;
     int256[][] public product;
     int256[][] public fitted;
+    uint256 public prediction;
 
     event Debug(string message, int256 res);
 
@@ -40,6 +45,7 @@ contract Test {
     Moment moment_prec = Moment(0x0300000000000000000000000000000000000006);
     MatrixMult matrixMult = MatrixMult(0x0300000000000000000000000000000000000005);
     Fit fit = Fit(0x0300000000000000000000000000000000000007);
+    PricePredict predict_prec = PricePredict(0x0300000000000000000000000000000000000008);
 
     function testMedian(uint256[] memory vals) public {
         med = prec.getMedian(vals);
@@ -67,6 +73,10 @@ contract Test {
 
     function testFit(uint256 fitType, int256[][] memory X, int256[][] memory Y) public {
         fitted = fit.fit(fitType, X, Y);
+    }
+
+    function testPrediction(uint256 steps) public {
+        prediction = predict_prec.getPredictPrice(steps);
     }
 
     function getFitted() public view returns (int256[][] memory) {
