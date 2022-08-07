@@ -22,8 +22,9 @@ interface IPFSMoment{
     function getMoment(string memory ipfsHash, uint256 moment) external view returns (uint256);
 }
 interface IPFSFit{
-    function fit(string memory ipfsHash, uint256 fitType) external view returns (int256[][] calldata, int256[] calldata);
+    function getFitted(string memory ipfsHash, uint256 fitType) external view returns (int256[][] calldata, int256[] calldata);
 }
+
 interface Fit {
     function fit(
         uint256 fitType,
@@ -38,7 +39,8 @@ contract Test {
     int256[] public sample;
     int256[][] public product;
     int256[][] public fitted;
-    int256[][] public ipfsFitted;
+    int256[][] public ipfsCoeffs;
+    int256[] public ipfsIntercepts;
     uint256 public ipfsMomentRes;
 
     event Debug(string message, int256 res);
@@ -76,10 +78,15 @@ contract Test {
     }
 
     function testIPFSFit(string memory ipfsHash, uint256 fitType) public {
-        ipfsFitted = ipfsFit.getFitted(ipfsHash, fitType);
+        (ipfsCoeffs, ipfsIntercepts) = ipfsFit.getFitted(ipfsHash, fitType);
     }
-    function getIPFSFitted(string memory ipfsHash, uint256 fitType) public view returns (int256[][] memory){
-        return ipfsFitted;
+
+    function getIPFSCoeffs() public view returns (int256[][] memory){
+        return ipfsCoeffs;
+    }
+
+    function getIPFSIntercepts() public view returns (int256[] memory){
+        return ipfsIntercepts;
     }
 
     function getMatrixMulti() public view returns (int256[][] memory) {

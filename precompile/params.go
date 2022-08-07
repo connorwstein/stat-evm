@@ -53,7 +53,7 @@ var (
 	ContractMomentAddress            = common.HexToAddress("0x0300000000000000000000000000000000000006")
 	ContractIPFSMomentAddress        = common.HexToAddress("0x0300000000000000000000000000000000000008")
 	ContractFitAddress               = common.HexToAddress("0x0300000000000000000000000000000000000007")
-	ContractIPFSFitAddress           = common.HexToAddress("0x0300000000000000000000000000000000000008")
+	ContractIPFSFitAddress           = common.HexToAddress("0x0300000000000000000000000000000000000009")
 
 	UsedAddresses = []common.Address{
 		ContractDeployerAllowListAddress,
