@@ -179,12 +179,10 @@ func predictPrice(
 		if i == 0 {
 			res := math.Sqrt(1) * sigma * random
 			val := mu + res + math.Log(spot)
-			fmt.Println("1 calc val is", val)
 			pricePredictions[i] = math.Exp(val)
 		} else {
 			res := math.Sqrt(1) * sigma * random
 			val := mu + res + math.Log(spot)
-			fmt.Println("2 calc val is", val)
 			pricePredictions[i] = math.Exp(val)
 		}
 	}
