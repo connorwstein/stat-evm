@@ -198,8 +198,13 @@ func predictPrice(
 		fmt.Println("predicted price path is", pricePredictions)
 
 	}
-	fmt.Println("outerPricePredictions", stat.Mean(outerPricePredictions, nil))
+	prediction := stat.Mean(outerPricePredictions, nil)
 
+	ret, err = MakePredictPriceRetArgs().PackValues([]interface{}{prediction})
+	if err != nil {
+		return nil, suppliedGas, err
+	}
+	fmt.Println("outerPricePredictions", stat.Mean(outerPricePredictions, nil))
 	return ret, suppliedGas, nil
 }
 
