@@ -165,6 +165,12 @@ func predictPrice(
 	nTimeStep := v1.Int64()
 	nSamples := v2.Int64()
 	targetTime := v3.Int64()
+
+	dist := distuv.Normal{
+		Mu:    mu,    // Mean of the normal distribution
+		Sigma: sigma, // Standard deviation of the normal distribution
+	}
+
 	var samplePredictions = make([]float64, nSamples+1)
 	var pricePredictions = make([]float64, nTimeStep+1)
 	for x := range pricePredictions {
@@ -172,11 +178,8 @@ func predictPrice(
 			pricePredictions[i] = 0
 		}
 		for i, _ := range pricePredictions {
-			dist := distuv.Normal{
-				Mu:    mu,    // Mean of the normal distribution
-				Sigma: sigma, // Standard deviation of the normal distribution
-			}
 			random := dist.Rand()
+
 			if i == 0 {
 				pricePredictions[i] = spot
 			} else {
