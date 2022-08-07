@@ -177,18 +177,13 @@ func predictPrice(
 		}
 		random := dist.Rand()
 		if i == 0 {
-			prevPrice := pricePredictions[i]
-			// fmt.Println("(first elm)Prev val is", prevPrice)
 			res := math.Sqrt(1) * sigma * random
-			val := mu + res + prevPrice
+			val := mu + res + math.Log(spot)
 			fmt.Println("1 calc val is", val)
 			pricePredictions[i] = math.Exp(val)
 		} else {
-			prevPrice := pricePredictions[i-1]
-			// fmt.Println("(not first elm)Prev val is", prevPrice)
-			fmt.Println("rand val is", random)
 			res := math.Sqrt(1) * sigma * random
-			val := mu + res + prevPrice
+			val := mu + res + math.Log(spot)
 			fmt.Println("2 calc val is", val)
 			pricePredictions[i] = math.Exp(val)
 		}
