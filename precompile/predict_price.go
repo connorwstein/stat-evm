@@ -163,14 +163,13 @@ func predictPrice(
 	spot := output[len(output)-1]
 	fmt.Println("Spot", spot)
 
-	nTimeStep := 100
+	nTimeStep := 5
 	var pricePredictions = make([]float64, nTimeStep)
 
 	for i := range pricePredictions {
 		pricePredictions[i] = 0
 	}
 	pricePredictions[0] = math.Log(spot)
-	fmt.Println("Emtpry slice", pricePredictions)
 	for i, _ := range pricePredictions {
 		dist := distuv.Normal{
 			Mu:    mu,    // Mean of the normal distribution
@@ -180,27 +179,21 @@ func predictPrice(
 		if i == 0 {
 			prevPrice := pricePredictions[i]
 			// fmt.Println("(first elm)Prev val is", prevPrice)
-			fmt.Println("rand val is", random)
 			res := math.Sqrt(1) * sigma * random
-			fmt.Println("calc mu is", mu)
-			fmt.Println("calc sigma is", sigma)
-			fmt.Println("calc res is", res)
 			val := mu + res + prevPrice
-			fmt.Println("calc val is", val)
-			pricePredictions[i] = val
+			fmt.Println("1 calc val is", val)
+			pricePredictions[i] = math.Exp(val)
 		} else {
 			prevPrice := pricePredictions[i-1]
 			// fmt.Println("(not first elm)Prev val is", prevPrice)
 			fmt.Println("rand val is", random)
 			res := math.Sqrt(1) * sigma * random
-			fmt.Println("calc mu is", mu)
-			fmt.Println("calc sigma is", sigma)
-			fmt.Println("calc res is", res)
 			val := mu + res + prevPrice
-			fmt.Println("calc val is", val)
-			pricePredictions[i] = val
+			fmt.Println("2 calc val is", val)
+			pricePredictions[i] = math.Exp(val)
 		}
 	}
+
 	fmt.Println(pricePredictions)
 	return ret, suppliedGas, nil
 }
